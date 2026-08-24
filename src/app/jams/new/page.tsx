@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { CreateJamForm } from "@/components/CreateJamForm";
 import { LogoutButton } from "@/components/LogoutButton";
 
@@ -31,7 +32,7 @@ export default async function NewJamPage() {
         <p className="panel-title">Criar Jam</p>
         <CreateJamForm />
       </div>
-      <div className="footer">jampla &mdash; MVP</div>
+      <SiteFooter />
     </main>
   );
 }

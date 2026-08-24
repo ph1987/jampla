@@ -2,9 +2,11 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ConnectYoutubeButton } from "@/components/ConnectYoutubeButton";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -66,6 +68,7 @@ export default async function DashboardPage() {
                   <a href={`/j/${jam.slug}`} className="hint-text">
                     /j/{jam.slug}
                   </a>
+                  <CopyLinkButton path={`/j/${jam.slug}`} />
                   {pendingCount > 0 && (
                     <>
                       {" "}
@@ -86,7 +89,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <div className="footer">jampla &mdash; MVP</div>
+      <SiteFooter />
     </main>
   );
 }

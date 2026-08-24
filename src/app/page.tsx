@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { LogoutButton } from "@/components/LogoutButton";
 
@@ -58,7 +59,7 @@ export default async function Home({
         </div>
       </div>
 
-      <div className="footer">jampla &mdash; MVP</div>
+      <SiteFooter />
     </main>
   );
 }

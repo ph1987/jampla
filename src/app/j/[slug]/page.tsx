@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -36,7 +37,7 @@ export default async function JamPage({
           </p>
           <LoginForm redirectTo={`/j/${slug}`} />
         </div>
-        <div className="footer">jampla &mdash; MVP</div>
+        <SiteFooter />
       </main>
     );
   }
@@ -53,7 +54,7 @@ export default async function JamPage({
           <p className="panel-title">{jam.name}</p>
           <p className="error-text">Você foi removido desta Jam.</p>
         </div>
-        <div className="footer">jampla &mdash; MVP</div>
+        <SiteFooter />
       </main>
     );
   }
@@ -119,7 +120,7 @@ export default async function JamPage({
         )}
       </div>
 
-      <div className="footer">jampla &mdash; MVP</div>
+      <SiteFooter />
     </main>
   );
 }

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { approveSuggestion, rejectSuggestion } from "./actions";
 import { LogoutButton } from "@/components/LogoutButton";
 
@@ -107,7 +108,7 @@ export default async function ManageJamPage({
         )}
       </div>
 
-      <div className="footer">jampla &mdash; MVP</div>
+      <SiteFooter />
     </main>
   );
 }
