@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// User/Session/Account/Verification models are generated below this line
+// by `npx @better-auth/cli generate` — do not hand-edit their fields.
+
+model Jam {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  youtubePlaylistId String
+  ownerId           String
+  allowDuplicates   Boolean  @default(false)
+  maxLinksPerUser   Int      @default(5)
+  minSecondsBetween Int      @default(30)
+  requireApproval   Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  suggestions Suggestion[]
+  bans        JamBan[]
+
+  @@index([ownerId])
+}
+
+model Suggestion {
+  id           String           @id @default(cuid())
+  jamId        String
+  videoId      String
+  videoTitle   String
+  thumbnailUrl String
+  submittedBy  String
+  status       SuggestionStatus @default(PENDING)
+  createdAt    DateTime         @default(now())
+  reviewedAt   DateTime?
+
+  jam Jam @relation(fields: [jamId], references: [id], onDelete: Cascade)
+
+  @@index([jamId, status])
+  @@index([submittedBy])
+}
+
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model JamBan {
+  id     String @id @default(cuid())
+  jamId  String
+  userId String
+
+  jam Jam @relation(fields: [jamId], references: [id], onDelete: Cascade)
+
+  @@unique([jamId, userId])
+}
+
+model User {
+  id              String    @id
+  name            String
+  email           String
+  emailVerified   Boolean   @default(false)
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  username        String?
+  displayUsername String?
+  sessions        Session[]
+  accounts        Account[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  issuer                String?
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}

@@ -1,69 +1,64 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { SiteHeader } from "@/components/SiteHeader";
+import { LoginForm } from "@/components/LoginForm";
+import { LogoutButton } from "@/components/LogoutButton";
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const session = await auth.api.getSession({ headers: await headers() });
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="page">
+      <SiteHeader isLoggedIn={!!session} />
+
+      <div className="statline">
+        jampla: playlists colaborativas do YouTube · <b>MVP</b> em construção
+      </div>
+
+      {session ? (
+        <div className="statline">
+          Logado como{" "}
+          <a href="/dashboard">
+            <b>{session.user.username ?? session.user.email}</b>
+          </a>{" "}
+          <span className="sep">|</span> <LogoutButton />
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : (
+        <div className="panel">
+          <p className="panel-title">Login</p>
+          <LoginForm redirectTo={next || "/dashboard"} />
         </div>
-      </main>
-    </div>
+      )}
+
+      <div className="two-col">
+        <div className="panel">
+          <p className="panel-title">Como funciona</p>
+          <ul className="bullet-list">
+            <li>Crie sua conta e conecte sua conta do YouTube</li>
+            <li>Inicie uma Jam a partir de uma playlist sua</li>
+            <li>Compartilhe o link da Jam com quem quiser</li>
+            <li>Convidados colam links de vídeos do YouTube</li>
+            <li>Você configura limites, duplicados e aprovação</li>
+          </ul>
+        </div>
+
+        <div className="panel" id="como-funciona">
+          <p className="panel-title">Regras configuráveis por Jam</p>
+          <ul className="bullet-list">
+            <li>Permitir ou não links repetidos</li>
+            <li>Máximo de links por convidado</li>
+            <li>Intervalo mínimo entre envios (anti-flood)</li>
+            <li>Aprovação manual ligada ou desligada</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="footer">jampla &mdash; MVP</div>
+    </main>
   );
 }
