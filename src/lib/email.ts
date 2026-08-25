@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "jampla <onboarding@resend.dev>";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "Jampla <onboarding@resend.dev>";
 
 export async function sendVerificationEmail(to: string, url: string) {
   if (!process.env.RESEND_API_KEY) {
@@ -12,13 +12,16 @@ export async function sendVerificationEmail(to: string, url: string) {
   const { error } = await resend.emails.send({
     from: FROM,
     to,
-    subject: "Confirme sua conta no jampla",
+    subject: "Confirme sua conta no Jampla",
     html: `
-      <div style="background:#000;color:#ff9955;font-family:'Courier New',Courier,monospace;padding:24px;">
-        <p style="color:#ff6600;font-weight:bold;">jampla</p>
-        <p>Confirme sua conta clicando no link abaixo:</p>
-        <p><a href="${url}" style="color:#ff8800;">${url}</a></p>
-        <p style="color:#b06a2e;font-size:12px;">Se você não criou essa conta, ignore este e-mail.</p>
+      <div style="background:#000;color:#ff9955;font-family:'Courier New',Courier,monospace;padding:32px 24px;text-align:center;">
+        <p style="color:#ff6600;font-weight:bold;font-size:20px;margin:0 0 16px;">Jampla</p>
+        <p style="margin:0 0 20px;">Confirme sua conta para poder entrar.</p>
+        <p style="margin:0 0 20px;">
+          <a href="${url}" style="display:inline-block;background:#1a0d00;border:1px solid #ff6600;color:#ff6600;padding:10px 28px;text-decoration:none;font-weight:bold;">Confirmar conta</a>
+        </p>
+        <p style="color:#b06a2e;font-size:12px;margin:0 0 4px;">Se você não criou essa conta, ignore este e-mail.</p>
+        <p style="color:#7a3d10;font-size:11px;margin:0;">Ou copie e cole este link no navegador: ${url}</p>
       </div>
     `,
   });
