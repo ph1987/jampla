@@ -84,6 +84,9 @@ a:visited {
   padding: 6px 4px;
   color: var(--text-dim);
   border-bottom: 1px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
 .statline b {
@@ -113,6 +116,10 @@ a:visited {
   color: var(--text-dim);
 }
 
+table td.field-label {
+  padding-right: 6px;
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"] {
@@ -122,6 +129,7 @@ input[type="password"] {
   font-family: inherit;
   font-size: 13px;
   padding: 3px 6px;
+  width: 220px;
 }
 
 input[type="text"]:focus,

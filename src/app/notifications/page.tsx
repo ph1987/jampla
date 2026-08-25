@@ -40,12 +40,14 @@ export default async function NotificationsPage() {
       <SiteHeader isLoggedIn />
 
       <div className="statline">
-        Logado como{" "}
-        <a href="/dashboard">
-          <b>{session.user.username ?? session.user.email}</b>
-        </a>{" "}
-        ({points}){" "}
-        <span className="sep">|</span> <LogoutButton />
+        <span>
+          Olá,{" "}
+          <a href="/dashboard">
+            <b>{session.user.username ?? session.user.email}</b>
+          </a>{" "}
+          ({points})
+        </span>
+        <LogoutButton />
       </div>
 
       <div className="panel">

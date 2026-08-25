@@ -50,13 +50,15 @@ export default async function ManageJamPage({
       <SiteHeader isLoggedIn />
 
       <div className="statline">
-        Logado como{" "}
-        <a href="/dashboard">
-          <b>{session.user.username ?? session.user.email}</b>
-        </a>{" "}
-        ({points}){" "}
-        <span className="sep">|</span> <NotificationBadge />{" "}
-        <span className="sep">|</span> <LogoutButton />
+        <span>
+          Olá,{" "}
+          <a href="/dashboard">
+            <b>{session.user.username ?? session.user.email}</b>
+          </a>{" "}
+          ({points}){" "}
+          <span className="sep">|</span> <NotificationBadge />
+        </span>
+        <LogoutButton />
       </div>
 
       <div className="panel">

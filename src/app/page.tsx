@@ -21,18 +21,22 @@ export default async function Home({
       <SiteHeader isLoggedIn={!!session} />
 
       <div className="statline">
-        jampla: playlists colaborativas do YouTube · <b>MVP</b> em construção
+        <span>
+          Playlists colaborativas do YouTube · <b>MVP</b> em construção
+        </span>
       </div>
 
       {session ? (
         <div className="statline">
-          Logado como{" "}
-          <a href="/dashboard">
-            <b>{session.user.username ?? session.user.email}</b>
-          </a>{" "}
-          ({points}){" "}
-          <span className="sep">|</span> <NotificationBadge />{" "}
-          <span className="sep">|</span> <LogoutButton />
+          <span>
+            Olá,{" "}
+            <a href="/dashboard">
+              <b>{session.user.username ?? session.user.email}</b>
+            </a>{" "}
+            ({points}){" "}
+            <span className="sep">|</span> <NotificationBadge />
+          </span>
+          <LogoutButton />
         </div>
       ) : (
         <div className="panel">

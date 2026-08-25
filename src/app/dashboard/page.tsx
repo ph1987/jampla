@@ -45,9 +45,11 @@ export default async function DashboardPage() {
       <SiteHeader isLoggedIn />
 
       <div className="statline">
-        Logado como <b>{session.user.username ?? session.user.email}</b> ({points}){" "}
-        <span className="sep">|</span> <NotificationBadge />{" "}
-        <span className="sep">|</span> <LogoutButton />
+        <span>
+          Olá, <b>{session.user.username ?? session.user.email}</b> ({points}){" "}
+          <span className="sep">|</span> <NotificationBadge />
+        </span>
+        <LogoutButton />
       </div>
 
       <div className="panel">
