@@ -10,8 +10,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    minPasswordLength: 10,
+    minPasswordLength: 8,
   },
+  trustedOrigins: [
+    "https://jampla.vercel.app",
+    "https://jampla.com",
+    "https://www.jampla.com",
+  ],
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,

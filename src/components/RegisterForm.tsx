@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { friendlyAuthError } from "@/lib/authErrors";
 
 export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
   const [email, setEmail] = useState("");
@@ -18,8 +19,8 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
       setError("Preencha todos os campos.");
       return;
     }
-    if (password.length < 10) {
-      setError("A senha precisa ter pelo menos 10 caracteres.");
+    if (password.length < 8) {
+      setError("A senha precisa ter pelo menos 8 caracteres.");
       return;
     }
     if (password !== confirmPassword) {
@@ -37,7 +38,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
     });
     setLoading(false);
     if (signUpError) {
-      setError(signUpError.message ?? "Não foi possível criar a conta.");
+      setError(friendlyAuthError(signUpError, "Não foi possível criar a conta. Tente novamente em instantes."));
       return;
     }
     setDone(true);

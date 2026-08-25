@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { friendlyAuthError } from "@/lib/authErrors";
 
 export function DisconnectYoutubeButton({ accountId }: { accountId: string }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function DisconnectYoutubeButton({ accountId }: { accountId: string }) {
     const { error: unlinkError } = await authClient.unlinkAccount({ accountId });
     setLoading(false);
     if (unlinkError) {
-      setError(unlinkError.message ?? "Não foi possível desconectar o YouTube.");
+      setError(friendlyAuthError(unlinkError, "Não foi possível desconectar o YouTube."));
       return;
     }
     router.refresh();

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { friendlyAuthError } from "@/lib/authErrors";
 
 export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
     });
     setLoading(false);
     if (signInError) {
-      setError(signInError.message ?? "Username ou senha inválidos.");
+      setError(friendlyAuthError(signInError, "Username ou senha inválidos."));
       return;
     }
     router.push(redirectTo);

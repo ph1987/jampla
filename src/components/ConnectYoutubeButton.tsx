@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { friendlyAuthError } from "@/lib/authErrors";
 
 export function ConnectYoutubeButton() {
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export function ConnectYoutubeButton() {
     });
     setLoading(false);
     if (linkError) {
-      setError(linkError.message ?? "Não foi possível conectar o YouTube.");
+      setError(friendlyAuthError(linkError, "Não foi possível conectar o YouTube."));
     }
   }
 
