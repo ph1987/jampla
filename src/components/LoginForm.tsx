@@ -52,7 +52,8 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
         <button type="submit" disabled={loading}>
           {loading ? "..." : "Ok"}
         </button>
-        <span className="sep">|</span>
+      </div>
+      <div className="row" style={{ marginTop: 8 }}>
         <a href={`/register?next=${encodeURIComponent(redirectTo)}`}>
           [Criar conta]
         </a>
