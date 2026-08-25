@@ -3,13 +3,17 @@
 import { useState } from "react";
 
 export function CopyLinkButton({ path }: { path: string }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function handleCopy() {
     const fullUrl = `${window.location.origin}${path}`;
-    await navigator.clipboard.writeText(fullUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setStatus("copied");
+    } catch {
+      setStatus("error");
+    }
+    setTimeout(() => setStatus("idle"), 1500);
   }
 
   return (
@@ -20,7 +24,7 @@ export function CopyLinkButton({ path }: { path: string }) {
       aria-label="Copiar link"
       style={{ fontSize: 11, padding: "0 6px", marginLeft: 4 }}
     >
-      {copied ? "copiado!" : "⧉"}
+      {status === "copied" ? "copiado!" : status === "error" ? "falhou" : "⧉"}
     </button>
   );
 }
