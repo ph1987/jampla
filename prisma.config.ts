@@ -8,6 +8,12 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
+  // This Prisma version's config type doesn't support `directUrl` yet, so
+  // `db push`/`migrate` run against the pooled URL by default — that hangs
+  // against Supabase's transaction pooler (port 6543). Run migration
+  // commands with DATABASE_URL temporarily overridden to DIRECT_URL
+  // (port 5432), e.g.:
+  //   DATABASE_URL="$DIRECT_URL" npx prisma db push
   datasource: {
     url: process.env["DATABASE_URL"],
   },
