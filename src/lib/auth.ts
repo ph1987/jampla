@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { username } from "better-auth/plugins";
 import { prisma } from "@/lib/prisma";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, sendResetPasswordEmail } from "@/lib/email";
 import { logActivity } from "@/lib/activityLog";
 
 export const auth = betterAuth({
@@ -11,6 +11,12 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     minPasswordLength: 8,
+    sendResetPassword: async ({ user, url }) => {
+      await sendResetPasswordEmail(user.email, url);
+    },
+    onPasswordReset: async ({ user }) => {
+      await logActivity({ actorId: user.id, action: "user.password_reset" });
+    },
   },
   trustedOrigins: [
     "https://jampla.vercel.app",

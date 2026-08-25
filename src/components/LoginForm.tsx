@@ -15,15 +15,14 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!username || !password) {
-      setError("Preencha username e senha.");
+      setError("Preencha username/e-mail e senha.");
       return;
     }
     setError("");
     setLoading(true);
-    const { error: signInError } = await authClient.signIn.username({
-      username,
-      password,
-    });
+    const { error: signInError } = username.includes("@")
+      ? await authClient.signIn.email({ email: username, password })
+      : await authClient.signIn.username({ username, password });
     setLoading(false);
     if (signInError) {
       setError(friendlyAuthError(signInError, "Username ou senha inválidos."));
@@ -36,7 +35,7 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
   return (
     <form onSubmit={handleSubmit}>
       <div className="row">
-        <span className="field-label">Username</span>
+        <span className="field-label">Username ou Email</span>
         <input
           type="text"
           value={username}
@@ -57,6 +56,8 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
         <a href={`/register?next=${encodeURIComponent(redirectTo)}`}>
           [Criar conta]
         </a>
+        <span className="sep">|</span>
+        <a href="/forgot-password">[Esqueci minha senha]</a>
       </div>
       {error && <p className="error-text">{error}</p>}
     </form>
