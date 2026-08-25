@@ -9,6 +9,7 @@ import { ConnectYoutubeButton } from "@/components/ConnectYoutubeButton";
 import { DisconnectYoutubeButton } from "@/components/DisconnectYoutubeButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { DashboardJamList } from "@/components/DashboardJamList";
+import { getUserScore } from "@/lib/ranking";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -32,12 +33,14 @@ export default async function DashboardPage() {
     where: { userId: session.user.id, providerId: "google" },
   });
 
+  const points = await getUserScore(session.user.id);
+
   return (
     <main className="page">
       <SiteHeader isLoggedIn />
 
       <div className="statline">
-        Logado como <b>{session.user.username ?? session.user.email}</b>{" "}
+        Logado como <b>{session.user.username ?? session.user.email}</b> ({points}){" "}
         <span className="sep">|</span> <NotificationBadge />{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>

@@ -8,6 +8,7 @@ import { LoginForm } from "@/components/LoginForm";
 import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
+import { getUserScore } from "@/lib/ranking";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "pendente",
@@ -73,6 +74,8 @@ export default async function JamPage({
   });
   const submitterNames = new Map(submitters.map((u) => [u.id, u.username]));
 
+  const points = await getUserScore(session.user.id);
+
   return (
     <main className="page">
       <SiteHeader isLoggedIn />
@@ -80,7 +83,7 @@ export default async function JamPage({
       <div className="statline">
         Logado como{" "}
         <a href="/dashboard">
-          <b>{session.user.username ?? session.user.email}</b>
+          <b>{session.user.username ?? session.user.email}</b> ({points})
         </a>{" "}
         <span className="sep">|</span> <NotificationBadge />{" "}
         <span className="sep">|</span> <LogoutButton />

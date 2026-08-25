@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RegisterForm } from "@/components/RegisterForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getUserScore } from "@/lib/ranking";
 
 export default async function RegisterPage({
   searchParams,
@@ -12,6 +13,7 @@ export default async function RegisterPage({
 }) {
   const { next } = await searchParams;
   const session = await auth.api.getSession({ headers: await headers() });
+  const points = session ? await getUserScore(session.user.id) : 0;
 
   return (
     <main className="page">
@@ -21,7 +23,7 @@ export default async function RegisterPage({
         <div className="statline">
           Logado como{" "}
           <a href="/dashboard">
-            <b>{session.user.username ?? session.user.email}</b>
+            <b>{session.user.username ?? session.user.email}</b> ({points})
           </a>{" "}
           <span className="sep">|</span> <LogoutButton />
         </div>

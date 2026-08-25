@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
+import { getUserScore } from "@/lib/ranking";
 
 export default async function Home({
   searchParams,
@@ -13,6 +14,7 @@ export default async function Home({
 }) {
   const { next } = await searchParams;
   const session = await auth.api.getSession({ headers: await headers() });
+  const points = session ? await getUserScore(session.user.id) : 0;
 
   return (
     <main className="page">
@@ -26,7 +28,7 @@ export default async function Home({
         <div className="statline">
           Logado como{" "}
           <a href="/dashboard">
-            <b>{session.user.username ?? session.user.email}</b>
+            <b>{session.user.username ?? session.user.email}</b> ({points})
           </a>{" "}
           <span className="sep">|</span> <NotificationBadge />{" "}
           <span className="sep">|</span> <LogoutButton />

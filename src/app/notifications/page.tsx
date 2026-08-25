@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LogoutButton } from "@/components/LogoutButton";
 import { markAllRead } from "./actions";
+import { getUserScore } from "@/lib/ranking";
 
 const TYPE_LABEL: Record<string, string> = {
   SUGGESTION_APPROVED: "aprovada",
@@ -32,6 +33,8 @@ export default async function NotificationsPage() {
 
   const hasUnread = notifications.some((n) => !n.read);
 
+  const points = await getUserScore(session.user.id);
+
   return (
     <main className="page">
       <SiteHeader isLoggedIn />
@@ -39,7 +42,7 @@ export default async function NotificationsPage() {
       <div className="statline">
         Logado como{" "}
         <a href="/dashboard">
-          <b>{session.user.username ?? session.user.email}</b>
+          <b>{session.user.username ?? session.user.email}</b> ({points})
         </a>{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>

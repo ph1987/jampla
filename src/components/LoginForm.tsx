@@ -35,7 +35,7 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
   return (
     <form onSubmit={handleSubmit}>
       <div className="row">
-        <span className="field-label">Login: Username</span>
+        <span className="field-label">Username</span>
         <input
           type="text"
           value={username}

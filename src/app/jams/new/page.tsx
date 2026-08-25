@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CreateJamForm } from "@/components/CreateJamForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getUserScore } from "@/lib/ranking";
 
 export default async function NewJamPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -16,6 +17,8 @@ export default async function NewJamPage() {
   });
   if (!youtubeAccount) redirect("/dashboard");
 
+  const points = await getUserScore(session.user.id);
+
   return (
     <main className="page">
       <SiteHeader isLoggedIn />
@@ -23,7 +26,7 @@ export default async function NewJamPage() {
       <div className="statline">
         Logado como{" "}
         <a href="/dashboard">
-          <b>{session.user.username ?? session.user.email}</b>
+          <b>{session.user.username ?? session.user.email}</b> ({points})
         </a>{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>
