@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { extractVideoId, fetchVideoInfo, getYoutubeClient } from "@/lib/youtube";
+import { logActivity } from "@/lib/activityLog";
+import { createNotification } from "@/lib/notifications";
 
 export type SubmitLinkState = { error?: string; success?: string };
 
@@ -59,7 +61,7 @@ export async function submitLink(
   if (!videoInfo) return { error: "Não foi possível encontrar esse vídeo." };
 
   if (jam.requireApproval) {
-    await prisma.suggestion.create({
+    const suggestion = await prisma.suggestion.create({
       data: {
         jamId: jam.id,
         videoId,
@@ -69,6 +71,21 @@ export async function submitLink(
         status: "PENDING",
       },
     });
+    await logActivity({
+      actorId: session.user.id,
+      action: "suggestion.submit",
+      jamId: jam.id,
+      suggestionId: suggestion.id,
+    });
+    if (session.user.id !== jam.ownerId) {
+      await createNotification({
+        userId: jam.ownerId,
+        type: "NEW_SUGGESTION",
+        message: `Nova sugestão em "${jam.name}": ${videoInfo.title}`,
+        jamId: jam.id,
+        suggestionId: suggestion.id,
+      });
+    }
     revalidatePath(`/j/${slug}`);
     return { success: "Link enviado! Aguardando aprovação." };
   }
@@ -89,7 +106,7 @@ export async function submitLink(
     return { error: "Não foi possível adicionar o vídeo à playlist." };
   }
 
-  await prisma.suggestion.create({
+  const suggestion = await prisma.suggestion.create({
     data: {
       jamId: jam.id,
       videoId,
@@ -99,6 +116,13 @@ export async function submitLink(
       status: "APPROVED",
       reviewedAt: new Date(),
     },
+  });
+  await logActivity({
+    actorId: session.user.id,
+    action: "suggestion.submit",
+    jamId: jam.id,
+    suggestionId: suggestion.id,
+    metadata: { autoApproved: true },
   });
   revalidatePath(`/j/${slug}`);
   return { success: "Adicionado à playlist!" };

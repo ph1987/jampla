@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getYoutubeClient } from "@/lib/youtube";
+import { logActivity } from "@/lib/activityLog";
+import { createNotification } from "@/lib/notifications";
 
 async function requireOwnedSuggestion(suggestionId: string) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -41,6 +43,22 @@ export async function approveSuggestion(formData: FormData) {
     data: { status: "APPROVED", reviewedAt: new Date() },
   });
 
+  await logActivity({
+    actorId: suggestion.jam.ownerId,
+    action: "suggestion.approve",
+    jamId: suggestion.jamId,
+    suggestionId: suggestion.id,
+  });
+  if (suggestion.submittedBy !== suggestion.jam.ownerId) {
+    await createNotification({
+      userId: suggestion.submittedBy,
+      type: "SUGGESTION_APPROVED",
+      message: `Sua sugestão "${suggestion.videoTitle}" foi aprovada em "${suggestion.jam.name}".`,
+      jamId: suggestion.jamId,
+      suggestionId: suggestion.id,
+    });
+  }
+
   revalidatePath(`/jams/${suggestion.jam.slug}`);
 }
 
@@ -52,6 +70,22 @@ export async function rejectSuggestion(formData: FormData) {
     where: { id: suggestionId },
     data: { status: "REJECTED", reviewedAt: new Date() },
   });
+
+  await logActivity({
+    actorId: suggestion.jam.ownerId,
+    action: "suggestion.reject",
+    jamId: suggestion.jamId,
+    suggestionId: suggestion.id,
+  });
+  if (suggestion.submittedBy !== suggestion.jam.ownerId) {
+    await createNotification({
+      userId: suggestion.submittedBy,
+      type: "SUGGESTION_REJECTED",
+      message: `Sua sugestão "${suggestion.videoTitle}" foi recusada em "${suggestion.jam.name}".`,
+      jamId: suggestion.jamId,
+      suggestionId: suggestion.id,
+    });
+  }
 
   revalidatePath(`/jams/${suggestion.jam.slug}`);
 }

@@ -54,6 +54,38 @@ enum SuggestionStatus {
   REJECTED
 }
 
+model ActivityLog {
+  id           String   @id @default(cuid())
+  actorId      String
+  action       String
+  jamId        String?
+  suggestionId String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([jamId])
+  @@index([actorId])
+}
+
+model Notification {
+  id           String           @id @default(cuid())
+  userId       String
+  type         NotificationType
+  message      String
+  jamId        String?
+  suggestionId String?
+  read         Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+
+  @@index([userId, read])
+}
+
+enum NotificationType {
+  SUGGESTION_APPROVED
+  SUGGESTION_REJECTED
+  NEW_SUGGESTION
+}
+
 model JamBan {
   id     String @id @default(cuid())
   jamId  String

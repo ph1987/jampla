@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { NotificationBadge } from "@/components/NotificationBadge";
 
 export default async function Home({
   searchParams,
@@ -27,6 +28,7 @@ export default async function Home({
           <a href="/dashboard">
             <b>{session.user.username ?? session.user.email}</b>
           </a>{" "}
+          <span className="sep">|</span> <NotificationBadge />{" "}
           <span className="sep">|</span> <LogoutButton />
         </div>
       ) : (

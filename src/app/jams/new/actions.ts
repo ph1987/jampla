@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getYoutubeClient, extractPlaylistId } from "@/lib/youtube";
 import { slugify, randomSuffix } from "@/lib/slug";
+import { logActivity } from "@/lib/activityLog";
 
 export type CreateJamState = { error?: string };
 
@@ -67,7 +68,7 @@ export async function createJam(
   }
   if (!slug) return { error: "Não foi possível gerar um link único, tente de novo." };
 
-  await prisma.jam.create({
+  const jam = await prisma.jam.create({
     data: {
       slug,
       name,
@@ -79,6 +80,8 @@ export async function createJam(
       requireApproval,
     },
   });
+
+  await logActivity({ actorId: session.user.id, action: "jam.create", jamId: jam.id });
 
   redirect("/dashboard");
 }

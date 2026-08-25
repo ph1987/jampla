@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { NotificationBadge } from "@/components/NotificationBadge";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "pendente",
@@ -81,6 +82,7 @@ export default async function JamPage({
         <a href="/dashboard">
           <b>{session.user.username ?? session.user.email}</b>
         </a>{" "}
+        <span className="sep">|</span> <NotificationBadge />{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>
 

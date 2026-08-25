@@ -102,7 +102,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
           </tr>
         </tbody>
       </table>
-      <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading} style={{ marginTop: 10 }}>
         {loading ? "..." : "Criar conta"}
       </button>
       {error && <p className="error-text">{error}</p>}

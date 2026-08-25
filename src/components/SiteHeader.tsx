@@ -18,6 +18,8 @@ export function SiteHeader({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         <a href="/">Início</a>
         <span className="sep">|</span>
         <a href="/#como-funciona">Como funciona</a>
+        <span className="sep">|</span>
+        <a href="/ranking">Ranking</a>
         {!isLoggedIn && (
           <>
             <span className="sep">|</span>

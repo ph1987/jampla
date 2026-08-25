@@ -6,7 +6,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ConnectYoutubeButton } from "@/components/ConnectYoutubeButton";
-import { CopyLinkButton } from "@/components/CopyLinkButton";
+import { DisconnectYoutubeButton } from "@/components/DisconnectYoutubeButton";
+import { NotificationBadge } from "@/components/NotificationBadge";
+import { DashboardJamList } from "@/components/DashboardJamList";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -24,7 +26,7 @@ export default async function DashboardPage() {
     where: { jamId: { in: jams.map((j) => j.id) }, status: "PENDING" },
     _count: true,
   });
-  const pendingByJam = new Map(pendingCounts.map((p) => [p.jamId, p._count]));
+  const initialPendingCounts = Object.fromEntries(pendingCounts.map((p) => [p.jamId, p._count]));
 
   const youtubeAccount = await prisma.account.findFirst({
     where: { userId: session.user.id, providerId: "google" },
@@ -36,13 +38,17 @@ export default async function DashboardPage() {
 
       <div className="statline">
         Logado como <b>{session.user.username ?? session.user.email}</b>{" "}
+        <span className="sep">|</span> <NotificationBadge />{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>
 
       <div className="panel">
         <p className="panel-title">Conta do YouTube</p>
         {youtubeAccount ? (
-          <p className="hint-text">Conectada</p>
+          <>
+            <p className="hint-text">Conectada</p>
+            <DisconnectYoutubeButton accountId={youtubeAccount.id} />
+          </>
         ) : (
           <>
             <p className="hint-text">
@@ -56,32 +62,7 @@ export default async function DashboardPage() {
 
       <div className="panel">
         <p className="panel-title">Minhas Jams</p>
-        {jams.length === 0 ? (
-          <p className="hint-text">Você ainda não criou nenhuma Jam.</p>
-        ) : (
-          <ul className="bullet-list">
-            {jams.map((jam) => {
-              const pendingCount = pendingByJam.get(jam.id) ?? 0;
-              return (
-                <li key={jam.id}>
-                  <a href={`/jams/${jam.slug}`}>{jam.name}</a> —{" "}
-                  <a href={`/j/${jam.slug}`} className="hint-text">
-                    /j/{jam.slug}
-                  </a>
-                  <CopyLinkButton path={`/j/${jam.slug}`} />
-                  {pendingCount > 0 && (
-                    <>
-                      {" "}
-                      <span style={{ color: "var(--accent2)" }}>
-                        ({pendingCount} pendente{pendingCount > 1 ? "s" : ""})
-                      </span>
-                    </>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <DashboardJamList jams={jams} initialPendingCounts={initialPendingCounts} />
         {youtubeAccount && (
           <p style={{ marginTop: 10 }}>
             <a href="/jams/new">[Criar Jam]</a>

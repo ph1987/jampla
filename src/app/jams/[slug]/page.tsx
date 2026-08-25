@@ -4,8 +4,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { approveSuggestion, rejectSuggestion } from "./actions";
 import { LogoutButton } from "@/components/LogoutButton";
+import { NotificationBadge } from "@/components/NotificationBadge";
+import { PendingSuggestionsPanel } from "@/components/PendingSuggestionsPanel";
 
 export default async function ManageJamPage({
   params,
@@ -39,7 +40,7 @@ export default async function ManageJamPage({
     where: { id: { in: submitterIds } },
     select: { id: true, username: true },
   });
-  const submitterNames = new Map(submitters.map((u) => [u.id, u.username]));
+  const submitterNames = Object.fromEntries(submitters.map((u) => [u.id, u.username]));
 
   return (
     <main className="page">
@@ -50,6 +51,7 @@ export default async function ManageJamPage({
         <a href="/dashboard">
           <b>{session.user.username ?? session.user.email}</b>
         </a>{" "}
+        <span className="sep">|</span> <NotificationBadge />{" "}
         <span className="sep">|</span> <LogoutButton />
       </div>
 
@@ -61,52 +63,10 @@ export default async function ManageJamPage({
         </p>
       </div>
 
-      <div className="panel">
-        <p className="panel-title">Pendentes ({pending.length})</p>
-        {pending.length === 0 ? (
-          <p className="hint-text">Nenhuma sugestão pendente.</p>
-        ) : (
-          <ul className="bullet-list">
-            {pending.map((s) => (
-              <li key={s.id} className="row" style={{ marginBottom: 6 }}>
-                <span>
-                  {s.videoTitle} —{" "}
-                  <span className="hint-text">
-                    {submitterNames.get(s.submittedBy) ?? "?"}
-                  </span>
-                </span>
-                <form action={approveSuggestion}>
-                  <input type="hidden" name="suggestionId" value={s.id} />
-                  <button type="submit">Aprovar</button>
-                </form>
-                <form action={rejectSuggestion}>
-                  <input type="hidden" name="suggestionId" value={s.id} />
-                  <button type="submit">Rejeitar</button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="panel">
-        <p className="panel-title">Histórico recente</p>
-        {reviewed.length === 0 ? (
-          <p className="hint-text">Nada revisado ainda.</p>
-        ) : (
-          <ul className="bullet-list">
-            {reviewed.map((s) => (
-              <li key={s.id}>
-                {s.videoTitle} —{" "}
-                <span className="hint-text">
-                  {submitterNames.get(s.submittedBy) ?? "?"} ·{" "}
-                  {s.status === "APPROVED" ? "aprovado" : "rejeitado"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <PendingSuggestionsPanel
+        slug={slug}
+        initialData={{ pending, reviewed, submitterNames }}
+      />
 
       <SiteFooter />
     </main>
