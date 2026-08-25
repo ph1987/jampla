@@ -28,8 +28,9 @@ export default async function Home({
         <div className="statline">
           Logado como{" "}
           <a href="/dashboard">
-            <b>{session.user.username ?? session.user.email}</b> ({points})
+            <b>{session.user.username ?? session.user.email}</b>
           </a>{" "}
+          ({points}){" "}
           <span className="sep">|</span> <NotificationBadge />{" "}
           <span className="sep">|</span> <LogoutButton />
         </div>

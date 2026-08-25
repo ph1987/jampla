@@ -20,6 +20,22 @@ export async function getYoutubeClient(userId: string) {
   return google.youtube({ version: "v3", auth: oauth2Client });
 }
 
+export async function getYoutubeChannelInfo(
+  userId: string,
+): Promise<{ title: string; thumbnailUrl: string } | null> {
+  try {
+    const youtube = await getYoutubeClient(userId);
+    const res = await youtube.channels.list({ part: ["snippet"], mine: true });
+    const channel = res.data.items?.[0];
+    const thumbnailUrl = channel?.snippet?.thumbnails?.default?.url;
+    if (!channel || !thumbnailUrl) return null;
+    return { title: channel.snippet?.title ?? "", thumbnailUrl };
+  } catch (err) {
+    console.error("getYoutubeChannelInfo failed", err);
+    return null;
+  }
+}
+
 export function extractVideoId(input: string): string | null {
   const trimmed = input.trim();
   try {

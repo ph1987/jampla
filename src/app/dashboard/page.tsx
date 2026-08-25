@@ -10,6 +10,7 @@ import { DisconnectYoutubeButton } from "@/components/DisconnectYoutubeButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { DashboardJamList } from "@/components/DashboardJamList";
 import { getUserScore } from "@/lib/ranking";
+import { getYoutubeChannelInfo } from "@/lib/youtube";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -35,6 +36,10 @@ export default async function DashboardPage() {
 
   const points = await getUserScore(session.user.id);
 
+  const channelInfo = youtubeAccount
+    ? await getYoutubeChannelInfo(session.user.id)
+    : null;
+
   return (
     <main className="page">
       <SiteHeader isLoggedIn />
@@ -49,6 +54,18 @@ export default async function DashboardPage() {
         <p className="panel-title">Conta do YouTube</p>
         {youtubeAccount ? (
           <>
+            {channelInfo && (
+              <p className="row" style={{ marginBottom: 8 }}>
+                <img
+                  src={channelInfo.thumbnailUrl}
+                  alt={channelInfo.title}
+                  width={48}
+                  height={48}
+                  style={{ border: "1px solid var(--border)" }}
+                />
+                <span className="hint-text">{channelInfo.title}</span>
+              </p>
+            )}
             <p className="hint-text">Conectada</p>
             <DisconnectYoutubeButton accountId={youtubeAccount.id} />
           </>

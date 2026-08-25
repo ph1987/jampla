@@ -69,8 +69,9 @@ export default async function RankingPage() {
         <div className="statline">
           Logado como{" "}
           <a href="/dashboard">
-            <b>{session.user.username ?? session.user.email}</b> ({pointsByUser.get(session.user.id) ?? 0})
+            <b>{session.user.username ?? session.user.email}</b>
           </a>{" "}
+          ({pointsByUser.get(session.user.id) ?? 0}){" "}
           <span className="sep">|</span> <NotificationBadge />{" "}
           <span className="sep">|</span> <LogoutButton />
         </div>
