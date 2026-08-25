@@ -57,19 +57,26 @@ export default async function DashboardPage() {
         {youtubeAccount ? (
           <>
             {channelInfo ? (
-              <div className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
-                <img
-                  src={channelInfo.thumbnailUrl}
-                  alt={channelInfo.title}
-                  width={48}
-                  height={48}
-                  style={{ border: "1px solid var(--border)", flexShrink: 0 }}
-                />
-                <div style={{ minWidth: 0 }}>
-                  <p className="hint-text" style={{ margin: 0 }}>{channelInfo.title}</p>
-                  <DisconnectYoutubeButton accountId={youtubeAccount.id} />
+              <>
+                <div className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
+                  <img
+                    src={channelInfo.thumbnailUrl}
+                    alt={channelInfo.title}
+                    width={48}
+                    height={48}
+                    style={{ border: "1px solid var(--border)", flexShrink: 0 }}
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <p className="hint-text" style={{ margin: 0 }}>{channelInfo.title}</p>
+                    <div style={{ marginTop: 7 }}>
+                      <DisconnectYoutubeButton accountId={youtubeAccount.id} showHint={false} />
+                    </div>
+                  </div>
                 </div>
-              </div>
+                <p className="hint-text">
+                  Jams existentes param de aceitar aprovações até você reconectar.
+                </p>
+              </>
             ) : (
               <DisconnectYoutubeButton accountId={youtubeAccount.id} />
             )}

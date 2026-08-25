@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createJam, type CreateJamState } from "@/app/jams/new/actions";
+import { NO_MAX_LINKS, NO_MIN_INTERVAL } from "@/lib/jamLimits";
 
 const initialState: CreateJamState = {};
 
@@ -29,30 +30,11 @@ export function CreateJamForm() {
               />
             </td>
           </tr>
-          <tr>
-            <td className="field-label">Máx. links por convidado</td>
-            <td>
-              <input
-                type="text"
-                name="maxLinksPerUser"
-                defaultValue="5"
-                autoComplete="off"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td className="field-label">Intervalo mínimo (segundos)</td>
-            <td>
-              <input
-                type="text"
-                name="minSecondsBetween"
-                defaultValue="30"
-                autoComplete="off"
-              />
-            </td>
-          </tr>
         </tbody>
       </table>
+      {/* Limites por convidado desativados por enquanto — valores fixos sem restrição, até remodelar essa parte */}
+      <input type="hidden" name="maxLinksPerUser" value={NO_MAX_LINKS} />
+      <input type="hidden" name="minSecondsBetween" value={NO_MIN_INTERVAL} />
 
       <div className="row" style={{ marginTop: 8 }}>
         <label>

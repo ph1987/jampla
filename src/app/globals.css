@@ -138,6 +138,10 @@ input[type="password"]:focus {
   outline: 1px solid var(--accent);
 }
 
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
 button,
 .btn {
   background: #1a0d00;

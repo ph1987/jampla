@@ -9,6 +9,7 @@ import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { getUserScore } from "@/lib/ranking";
+import { NO_MAX_LINKS, NO_MIN_INTERVAL } from "@/lib/jamLimits";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "pendente",
@@ -98,8 +99,12 @@ export default async function JamPage({
           <li>
             {jam.allowDuplicates ? "Links repetidos permitidos" : "Sem links repetidos"}
           </li>
-          <li>Máx. {jam.maxLinksPerUser} links por convidado</li>
-          <li>Intervalo mínimo de {jam.minSecondsBetween}s entre envios</li>
+          {jam.maxLinksPerUser < NO_MAX_LINKS && (
+            <li>Máx. {jam.maxLinksPerUser} links por convidado</li>
+          )}
+          {jam.minSecondsBetween > NO_MIN_INTERVAL && (
+            <li>Intervalo mínimo de {jam.minSecondsBetween}s entre envios</li>
+          )}
           <li>
             {jam.requireApproval
               ? "Aprovação manual antes de entrar na playlist"

@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
 
-export function DisconnectYoutubeButton({ accountId }: { accountId: string }) {
+export function DisconnectYoutubeButton({
+  accountId,
+  showHint = true,
+}: {
+  accountId: string;
+  showHint?: boolean;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,9 +33,11 @@ export function DisconnectYoutubeButton({ accountId }: { accountId: string }) {
       <button type="button" onClick={handleDisconnect} disabled={loading}>
         {loading ? "..." : "Desconectar YouTube"}
       </button>
-      <p className="hint-text">
-        Jams existentes param de aceitar aprovações até você reconectar.
-      </p>
+      {showHint && (
+        <p className="hint-text">
+          Jams existentes param de aceitar aprovações até você reconectar.
+        </p>
+      )}
       {error && <p className="error-text">{error}</p>}
     </div>
   );
