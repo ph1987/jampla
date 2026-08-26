@@ -61,9 +61,19 @@ export default async function Home({
           <p className="panel-title">Regras configuráveis por Jam</p>
           <ul className="bullet-list">
             <li>Permitir ou não links repetidos</li>
-            <li>Máximo de links por convidado</li>
-            <li>Intervalo mínimo entre envios (anti-flood)</li>
             <li>Aprovação manual ligada ou desligada</li>
+            <li>
+              Máximo de links por convidado{" "}
+              <span className="coming-soon">EM BREVE</span>
+            </li>
+            <li>
+              Intervalo mínimo entre envios (anti-flood){" "}
+              <span className="coming-soon">EM BREVE</span>
+            </li>
+            <li>
+              Deixar playlist pública no Jampla{" "}
+              <span className="coming-soon">EM BREVE</span>
+            </li>
           </ul>
         </div>
       </div>
