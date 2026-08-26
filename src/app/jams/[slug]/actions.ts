@@ -43,6 +43,11 @@ export async function approveSuggestion(formData: FormData) {
     data: { status: "APPROVED", reviewedAt: new Date() },
   });
 
+  await prisma.notification.updateMany({
+    where: { suggestionId: suggestion.id, type: "NEW_SUGGESTION" },
+    data: { read: true },
+  });
+
   await logActivity({
     actorId: suggestion.jam.ownerId,
     action: "suggestion.approve",
@@ -69,6 +74,11 @@ export async function rejectSuggestion(formData: FormData) {
   await prisma.suggestion.update({
     where: { id: suggestionId },
     data: { status: "REJECTED", reviewedAt: new Date() },
+  });
+
+  await prisma.notification.updateMany({
+    where: { suggestionId: suggestion.id, type: "NEW_SUGGESTION" },
+    data: { read: true },
   });
 
   await logActivity({

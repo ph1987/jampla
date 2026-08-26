@@ -7,7 +7,9 @@ import { approveSuggestion, rejectSuggestion } from "@/app/jams/[slug]/actions";
 
 type Suggestion = {
   id: string;
+  videoId: string;
   videoTitle: string;
+  thumbnailUrl: string;
   submittedBy: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
 };
@@ -64,8 +66,22 @@ export function PendingSuggestionsPanel({
           <ul className="bullet-list">
             {pending.map((s) => (
               <li key={s.id} className="row" style={{ marginBottom: 6 }}>
-                <span>
-                  {s.videoTitle} —{" "}
+                <img
+                  src={s.thumbnailUrl}
+                  alt=""
+                  width={48}
+                  height={27}
+                  style={{ border: "1px solid var(--border)", objectFit: "cover", flexShrink: 0 }}
+                />
+                <span style={{ minWidth: 0 }}>
+                  <a
+                    href={`https://www.youtube.com/watch?v=${s.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {s.videoTitle}
+                  </a>{" "}
+                  —{" "}
                   <span className="hint-text">
                     {submitterNames[s.submittedBy] ?? "?"}
                   </span>

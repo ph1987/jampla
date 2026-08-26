@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LogoutButton } from "@/components/LogoutButton";
 import { markAllRead } from "./actions";
 import { getUserScore } from "@/lib/ranking";
+import { LocalDateTime } from "@/components/LocalDateTime";
 
 const TYPE_LABEL: Record<string, string> = {
   SUGGESTION_APPROVED: "aprovada",
@@ -73,7 +74,7 @@ export default async function NotificationsPage() {
                   {href ? <a href={href}>{n.message}</a> : n.message}{" "}
                   <span className="hint-text">
                     · {TYPE_LABEL[n.type] ?? n.type} ·{" "}
-                    {n.createdAt.toLocaleString("pt-BR")}
+                    <LocalDateTime iso={n.createdAt.toISOString()} />
                   </span>
                 </li>
               );
