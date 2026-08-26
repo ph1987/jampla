@@ -67,6 +67,16 @@ export default async function ManageJamPage({
           Link para compartilhar:{" "}
           <a href={`/j/${jam.slug}`}>/j/{jam.slug}</a>
         </p>
+        <p className="hint-text">
+          Playlist no YouTube:{" "}
+          <a
+            href={`https://www.youtube.com/playlist?list=${jam.youtubePlaylistId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            abrir playlist
+          </a>
+        </p>
       </div>
 
       <PendingSuggestionsPanel

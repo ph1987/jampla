@@ -18,6 +18,7 @@ export async function createJam(
   if (!session) redirect("/");
 
   const name = String(formData.get("name") ?? "").trim();
+  const createNewPlaylist = formData.get("createNewPlaylist") === "on";
   const playlistInput = String(formData.get("playlistUrl") ?? "").trim();
   const allowDuplicates = formData.get("allowDuplicates") === "on";
   const requireApproval = formData.get("requireApproval") === "on";
@@ -26,8 +27,9 @@ export async function createJam(
 
   if (!name) return { error: "Informe um nome para a Jam." };
 
-  const playlistId = extractPlaylistId(playlistInput);
-  if (!playlistId) return { error: "Link de playlist inválido." };
+  if (!createNewPlaylist && !extractPlaylistId(playlistInput)) {
+    return { error: "Link de playlist inválido." };
+  }
 
   if (!Number.isFinite(maxLinksPerUser) || maxLinksPerUser < 1) {
     return { error: "Máximo de links por convidado inválido." };
@@ -44,17 +46,41 @@ export async function createJam(
     return { error: "Conecte sua conta do YouTube antes de criar uma Jam." };
   }
 
-  const [playlistRes, channelRes] = await Promise.all([
-    youtube.playlists.list({ part: ["snippet"], id: [playlistId] }),
-    youtube.channels.list({ part: ["id"], mine: true }),
-  ]);
+  let playlistId: string;
 
-  const playlist = playlistRes.data.items?.[0];
-  if (!playlist) return { error: "Playlist não encontrada." };
+  if (createNewPlaylist) {
+    try {
+      const created = await youtube.playlists.insert({
+        part: ["snippet", "status"],
+        requestBody: {
+          snippet: { title: name },
+          status: { privacyStatus: "unlisted" },
+        },
+      });
+      if (!created.data.id) throw new Error("missing playlist id in response");
+      playlistId = created.data.id;
+    } catch (err) {
+      console.error("playlists.insert failed", err);
+      return { error: "Não foi possível criar a playlist no YouTube." };
+    }
+  } else {
+    const parsedId = extractPlaylistId(playlistInput);
+    if (!parsedId) return { error: "Link de playlist inválido." };
 
-  const ownChannelId = channelRes.data.items?.[0]?.id;
-  if (!ownChannelId || playlist.snippet?.channelId !== ownChannelId) {
-    return { error: "Essa playlist não pertence à sua conta do YouTube." };
+    const [playlistRes, channelRes] = await Promise.all([
+      youtube.playlists.list({ part: ["snippet"], id: [parsedId] }),
+      youtube.channels.list({ part: ["id"], mine: true }),
+    ]);
+
+    const playlist = playlistRes.data.items?.[0];
+    if (!playlist) return { error: "Playlist não encontrada." };
+
+    const ownChannelId = channelRes.data.items?.[0]?.id;
+    if (!ownChannelId || playlist.snippet?.channelId !== ownChannelId) {
+      return { error: "Essa playlist não pertence à sua conta do YouTube." };
+    }
+
+    playlistId = parsedId;
   }
 
   let slug = "";

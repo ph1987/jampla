@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createJam, type CreateJamState } from "@/app/jams/new/actions";
 import { NO_MAX_LINKS, NO_MIN_INTERVAL } from "@/lib/jamLimits";
 
@@ -8,6 +8,7 @@ const initialState: CreateJamState = {};
 
 export function CreateJamForm() {
   const [state, formAction, pending] = useActionState(createJam, initialState);
+  const [createNewPlaylist, setCreateNewPlaylist] = useState(false);
 
   return (
     <form action={formAction}>
@@ -19,19 +20,32 @@ export function CreateJamForm() {
               <input type="text" name="name" autoComplete="off" />
             </td>
           </tr>
-          <tr>
-            <td className="field-label">Link da playlist</td>
-            <td>
-              <input
-                type="text"
-                name="playlistUrl"
-                placeholder="https://www.youtube.com/playlist?list=..."
-                autoComplete="off"
-              />
-            </td>
-          </tr>
+          {!createNewPlaylist && (
+            <tr>
+              <td className="field-label">Link da playlist</td>
+              <td>
+                <input
+                  type="text"
+                  name="playlistUrl"
+                  placeholder="https://www.youtube.com/playlist?list=..."
+                  autoComplete="off"
+                />
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
+      <div className="row">
+        <label>
+          <input
+            type="checkbox"
+            name="createNewPlaylist"
+            checked={createNewPlaylist}
+            onChange={(e) => setCreateNewPlaylist(e.target.checked)}
+          />{" "}
+          Criar playlist nova no YouTube (não tenho uma ainda)
+        </label>
+      </div>
       {/* Limites por convidado desativados por enquanto — valores fixos sem restrição, até remodelar essa parte */}
       <input type="hidden" name="maxLinksPerUser" value={NO_MAX_LINKS} />
       <input type="hidden" name="minSecondsBetween" value={NO_MIN_INTERVAL} />
