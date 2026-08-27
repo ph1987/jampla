@@ -15,7 +15,13 @@ export function NotificationBadge() {
 
   return (
     <a href="/notifications">
-      Notificações{unreadCount > 0 ? ` (${unreadCount})` : ""}
+      Notificações
+      {unreadCount > 0 && (
+        <span className="stat-badge notif-badge">
+          {" "}
+          {unreadCount} nova{unreadCount === 1 ? "" : "s"}
+        </span>
+      )}
     </a>
   );
 }

@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RegisterForm } from "@/components/RegisterForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
 
 export default async function RegisterPage({
@@ -25,8 +26,8 @@ export default async function RegisterPage({
             Olá,{" "}
             <a href="/dashboard">
               <b>{session.user.username ?? session.user.email}</b>
-            </a>{" "}
-            ({points})
+            </a>
+            <PointsBadge points={points} />
           </span>
           <LogoutButton />
         </div>

@@ -36,6 +36,61 @@ export async function getYoutubeChannelInfo(
   }
 }
 
+export type PlaylistVideo = {
+  videoId: string;
+  title: string;
+  channelTitle: string;
+  thumbnailUrl: string;
+};
+
+async function fetchPlaylistItemsOnce(
+  ownerId: string,
+  playlistId: string,
+): Promise<PlaylistVideo[]> {
+  const youtube = await getYoutubeClient(ownerId);
+  const res = await youtube.playlistItems.list({
+    part: ["snippet"],
+    playlistId,
+    maxResults: 50,
+  });
+  return (res.data.items ?? [])
+    .map((item) => ({
+      videoId: item.snippet?.resourceId?.videoId ?? "",
+      title: item.snippet?.title ?? "",
+      channelTitle:
+        item.snippet?.videoOwnerChannelTitle ?? item.snippet?.channelTitle ?? "",
+      thumbnailUrl:
+        item.snippet?.thumbnails?.medium?.url ?? item.snippet?.thumbnails?.default?.url ?? "",
+    }))
+    .filter((item) => item.videoId);
+}
+
+export async function getPlaylistItems(
+  ownerId: string,
+  playlistId: string,
+): Promise<{ items: PlaylistVideo[]; error: boolean }> {
+  try {
+    return { items: await fetchPlaylistItemsOnce(ownerId, playlistId), error: false };
+  } catch (err) {
+    console.error("getPlaylistItems failed, forcing a token refresh and retrying once", err);
+    // Better Auth only refreshes the stored Google token when its own
+    // `accessTokenExpiresAt` bookkeeping says it's due — that can drift out
+    // of sync with what Google actually accepts. Force a refresh once and
+    // retry before giving up, instead of surfacing a stale-token error.
+    try {
+      const account = await prisma.account.findFirst({
+        where: { userId: ownerId, providerId: "google" },
+      });
+      if (!account) throw new Error("YOUTUBE_NOT_CONNECTED");
+      await auth.api.refreshToken({ body: { accountId: account.id, userId: ownerId } });
+      return { items: await fetchPlaylistItemsOnce(ownerId, playlistId), error: false };
+    } catch (retryErr) {
+      console.error("getPlaylistItems retry after refresh failed", retryErr);
+      return { items: [], error: true };
+    }
+  }
+}
+
 export function extractVideoId(input: string): string | null {
   const trimmed = input.trim();
   try {

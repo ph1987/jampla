@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LoginForm } from "@/components/LoginForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
+import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
 
 export default async function Home({
@@ -33,7 +34,7 @@ export default async function Home({
             <a href="/dashboard">
               <b>{session.user.username ?? session.user.email}</b>
             </a>{" "}
-            ({points}){" "}
+            <PointsBadge points={points} />
             <span className="sep">|</span> <NotificationBadge />
           </span>
           <LogoutButton />

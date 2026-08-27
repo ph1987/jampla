@@ -32,7 +32,7 @@ export function DashboardJamList({
         const pendingCount = pendingByJam[jam.id] ?? 0;
         return (
           <li key={jam.id}>
-            <a href={`/jams/${jam.slug}`}>{jam.name}</a> —{" "}
+            <a href={`/j/${jam.slug}`}>{jam.name}</a> —{" "}
             <a href={`/j/${jam.slug}`} className="hint-text">
               /j/{jam.slug}
             </a>

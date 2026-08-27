@@ -64,7 +64,7 @@ export async function approveSuggestion(formData: FormData) {
     });
   }
 
-  revalidatePath(`/jams/${suggestion.jam.slug}`);
+  revalidatePath(`/j/${suggestion.jam.slug}`);
 }
 
 export async function rejectSuggestion(formData: FormData) {
@@ -97,5 +97,5 @@ export async function rejectSuggestion(formData: FormData) {
     });
   }
 
-  revalidatePath(`/jams/${suggestion.jam.slug}`);
+  revalidatePath(`/j/${suggestion.jam.slug}`);
 }

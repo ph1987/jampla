@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CreateJamForm } from "@/components/CreateJamForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
 
 export default async function NewJamPage() {
@@ -28,8 +29,8 @@ export default async function NewJamPage() {
           Olá,{" "}
           <a href="/dashboard">
             <b>{session.user.username ?? session.user.email}</b>
-          </a>{" "}
-          ({points})
+          </a>
+          <PointsBadge points={points} />
         </span>
         <LogoutButton />
       </div>

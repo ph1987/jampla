@@ -9,6 +9,7 @@ import { ConnectYoutubeButton } from "@/components/ConnectYoutubeButton";
 import { DisconnectYoutubeButton } from "@/components/DisconnectYoutubeButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { DashboardJamList } from "@/components/DashboardJamList";
+import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
 import { getYoutubeChannelInfo } from "@/lib/youtube";
 
@@ -46,7 +47,8 @@ export default async function DashboardPage() {
 
       <div className="statline">
         <span>
-          Olá, <b>{session.user.username ?? session.user.email}</b> ({points}){" "}
+          Olá, <b>{session.user.username ?? session.user.email}</b>
+          <PointsBadge points={points} />
           <span className="sep">|</span> <NotificationBadge />
         </span>
         <LogoutButton />

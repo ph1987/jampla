@@ -63,43 +63,53 @@ export function PendingSuggestionsPanel({
         {pending.length === 0 ? (
           <p className="hint-text">Nenhuma sugestão pendente.</p>
         ) : (
-          <ul className="bullet-list">
+          <ul className="bullet-list no-bullet">
             {pending.map((s) => (
-              <li key={s.id} className="row" style={{ marginBottom: 6 }}>
-                <img
-                  src={s.thumbnailUrl}
-                  alt=""
-                  width={48}
-                  height={27}
-                  style={{ border: "1px solid var(--border)", objectFit: "cover", flexShrink: 0 }}
-                />
-                <span style={{ minWidth: 0 }}>
+              <li
+                key={s.id}
+                className="row"
+                style={{ alignItems: "stretch", marginBottom: 6 }}
+              >
+                <a
+                  href={`https://www.youtube.com/watch?v=${s.videoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ flexShrink: 0 }}
+                >
+                  <img
+                    src={s.thumbnailUrl}
+                    alt=""
+                    width={162}
+                    height={92}
+                    style={{ border: "1px solid var(--border)", objectFit: "cover", display: "block" }}
+                  />
+                </a>
+                <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
                   <a
                     href={`https://www.youtube.com/watch?v=${s.videoId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     {s.videoTitle}
-                  </a>{" "}
-                  —{" "}
-                  <span className="hint-text">
-                    {submitterNames[s.submittedBy] ?? "?"}
+                  </a>
+                  <span className="hint-text">{submitterNames[s.submittedBy] ?? "?"}</span>
+                  <span className="row" style={{ marginTop: "auto" }}>
+                    <button
+                      type="button"
+                      disabled={pendingActionId === s.id}
+                      onClick={() => handleReview(approveSuggestion, s.id)}
+                    >
+                      Aprovar
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pendingActionId === s.id}
+                      onClick={() => handleReview(rejectSuggestion, s.id)}
+                    >
+                      Rejeitar
+                    </button>
                   </span>
-                </span>
-                <button
-                  type="button"
-                  disabled={pendingActionId === s.id}
-                  onClick={() => handleReview(approveSuggestion, s.id)}
-                >
-                  Aprovar
-                </button>
-                <button
-                  type="button"
-                  disabled={pendingActionId === s.id}
-                  onClick={() => handleReview(rejectSuggestion, s.id)}
-                >
-                  Rejeitar
-                </button>
+                </div>
               </li>
             ))}
           </ul>

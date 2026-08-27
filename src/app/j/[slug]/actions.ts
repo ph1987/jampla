@@ -81,7 +81,7 @@ export async function submitLink(
       await createNotification({
         userId: jam.ownerId,
         type: "NEW_SUGGESTION",
-        message: `Nova sugestão em "${jam.name}": ${videoInfo.title}`,
+        message: `solicitação em ${jam.name}`,
         jamId: jam.id,
         suggestionId: suggestion.id,
       });
