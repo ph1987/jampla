@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function ResetPasswordForm({ token }: { token?: string }) {
+  const dict = useDictionary();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,15 +16,15 @@ export function ResetPasswordForm({ token }: { token?: string }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!token) {
-      setError("Link inválido ou expirado.");
+      setError(dict.resetPassword.invalidTokenError);
       return;
     }
     if (password.length < 8) {
-      setError("A senha precisa ter pelo menos 8 caracteres.");
+      setError(dict.resetPassword.passwordTooShortError);
       return;
     }
     if (password !== confirmPassword) {
-      setError("As senhas não conferem.");
+      setError(dict.resetPassword.passwordMismatchError);
       return;
     }
     setError("");
@@ -33,7 +35,7 @@ export function ResetPasswordForm({ token }: { token?: string }) {
     });
     setLoading(false);
     if (resetError) {
-      setError(friendlyAuthError(resetError, "Não foi possível redefinir a senha. Peça um novo link."));
+      setError(friendlyAuthError(resetError, dict.resetPassword.genericError, dict));
       return;
     }
     setDone(true);
@@ -42,7 +44,7 @@ export function ResetPasswordForm({ token }: { token?: string }) {
   if (done) {
     return (
       <p>
-        Senha redefinida. <a href="/">Entrar</a>
+        {dict.resetPassword.doneMessage} <a href="/">{dict.resetPassword.doneLoginLink}</a>
       </p>
     );
   }
@@ -50,8 +52,8 @@ export function ResetPasswordForm({ token }: { token?: string }) {
   if (!token) {
     return (
       <p className="error-text">
-        Link inválido ou expirado.{" "}
-        <a href="/forgot-password">Peça um novo link</a>.
+        {dict.resetPassword.invalidLinkMessage}{" "}
+        <a href="/forgot-password">{dict.resetPassword.requestNewLink}</a>.
       </p>
     );
   }
@@ -61,7 +63,7 @@ export function ResetPasswordForm({ token }: { token?: string }) {
       <table>
         <tbody>
           <tr>
-            <td className="field-label">Nova senha</td>
+            <td className="field-label">{dict.resetPassword.newPassword}</td>
             <td>
               <input
                 type="password"
@@ -72,7 +74,7 @@ export function ResetPasswordForm({ token }: { token?: string }) {
             </td>
           </tr>
           <tr>
-            <td className="field-label">Confirmar senha</td>
+            <td className="field-label">{dict.resetPassword.confirmPassword}</td>
             <td>
               <input
                 type="password"
@@ -85,7 +87,7 @@ export function ResetPasswordForm({ token }: { token?: string }) {
         </tbody>
       </table>
       <button type="submit" disabled={loading} style={{ marginTop: 10 }}>
-        {loading ? "..." : "Redefinir senha"}
+        {loading ? "..." : dict.resetPassword.submit}
       </button>
       {error && <p className="error-text">{error}</p>}
     </form>

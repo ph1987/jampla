@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function ForgotPasswordForm() {
+  const dict = useDictionary();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ export function ForgotPasswordForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) {
-      setError("Informe seu e-mail.");
+      setError(dict.forgotPassword.missingEmailError);
       return;
     }
     setError("");
@@ -24,7 +26,7 @@ export function ForgotPasswordForm() {
     });
     setLoading(false);
     if (requestError) {
-      setError(friendlyAuthError(requestError, "Não foi possível enviar o e-mail. Tente novamente."));
+      setError(friendlyAuthError(requestError, dict.forgotPassword.genericError, dict));
       return;
     }
     setDone(true);
@@ -33,8 +35,9 @@ export function ForgotPasswordForm() {
   if (done) {
     return (
       <p>
-        Se <b>{email}</b> estiver cadastrado, enviamos um link para redefinir
-        a senha.
+        {dict.forgotPassword.donePrefix}
+        <b>{email}</b>
+        {dict.forgotPassword.doneSuffix}
       </p>
     );
   }
@@ -42,7 +45,7 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="row">
-        <span className="field-label">E-mail</span>
+        <span className="field-label">{dict.forgotPassword.email}</span>
         <input
           type="email"
           value={email}
@@ -50,7 +53,7 @@ export function ForgotPasswordForm() {
           autoComplete="email"
         />
         <button type="submit" disabled={loading}>
-          {loading ? "..." : "Enviar link"}
+          {loading ? "..." : dict.forgotPassword.submit}
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}

@@ -8,6 +8,7 @@ import { CreateJamForm } from "@/components/CreateJamForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function NewJamPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -19,6 +20,7 @@ export default async function NewJamPage() {
   if (!youtubeAccount) redirect("/dashboard");
 
   const points = await getUserScore(session.user.id);
+  const dict = await getDictionary();
 
   return (
     <main className="page">
@@ -26,7 +28,7 @@ export default async function NewJamPage() {
 
       <div className="statline">
         <span>
-          Olá,{" "}
+          {dict.common.greeting}{" "}
           <a href="/dashboard">
             <b>{session.user.username ?? session.user.email}</b>
           </a>
@@ -36,7 +38,7 @@ export default async function NewJamPage() {
       </div>
 
       <div className="panel">
-        <p className="panel-title">Criar Jam</p>
+        <p className="panel-title">{dict.jamsNew.title}</p>
         <CreateJamForm />
       </div>
       <SiteFooter />

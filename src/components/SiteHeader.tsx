@@ -1,3 +1,6 @@
+import { getDictionary } from "@/lib/i18n/server";
+import { LanguageSwitcher } from "@/lib/i18n/LanguageSwitcher";
+
 const LOGO = `       █████                                     ████
       ░░███                                     ░░███
        ░███   ██████   █████████████   ████████  ░███   ██████
@@ -10,22 +13,27 @@ const LOGO = `       █████                                     ██�
                                        █████
                                       ░░░░░`;
 
-export function SiteHeader({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+export async function SiteHeader({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+  const dict = await getDictionary();
+
   return (
     <>
       <pre className="ascii-logo">{LOGO}</pre>
       <nav className="navbar">
-        <a href="/">Início</a>
-        <span className="sep">|</span>
-        <a href="/#como-funciona">Como funciona</a>
-        <span className="sep">|</span>
-        <a href="/ranking">Ranking</a>
-        {!isLoggedIn && (
-          <>
-            <span className="sep">|</span>
-            <a href="/register">Criar conta</a>
-          </>
-        )}
+        <span>
+          <a href="/">{dict.nav.home}</a>
+          <span className="sep">|</span>
+          <a href="/#como-funciona">{dict.nav.howItWorks}</a>
+          <span className="sep">|</span>
+          <a href="/ranking">{dict.nav.ranking}</a>
+          {!isLoggedIn && (
+            <>
+              <span className="sep">|</span>
+              <a href="/register">{dict.nav.createAccount}</a>
+            </>
+          )}
+        </span>
+        <LanguageSwitcher />
       </nav>
     </>
   );

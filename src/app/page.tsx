@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function Home({
   searchParams,
@@ -16,6 +17,7 @@ export default async function Home({
   const { next } = await searchParams;
   const session = await auth.api.getSession({ headers: await headers() });
   const points = session ? await getUserScore(session.user.id) : 0;
+  const dict = await getDictionary();
 
   return (
     <main className="page">
@@ -23,14 +25,16 @@ export default async function Home({
 
       <div className="statline">
         <span>
-          Playlists colaborativas do YouTube · <b>MVP</b> em construção
+          {dict.home.taglinePrefix}
+          <b>{dict.home.taglineMvp}</b>
+          {dict.home.taglineSuffix}
         </span>
       </div>
 
       {session ? (
         <div className="statline">
           <span>
-            Olá,{" "}
+            {dict.common.greeting}{" "}
             <a href="/dashboard">
               <b>{session.user.username ?? session.user.email}</b>
             </a>{" "}
@@ -41,39 +45,37 @@ export default async function Home({
         </div>
       ) : (
         <div className="panel">
-          <p className="panel-title">Login</p>
+          <p className="panel-title">{dict.home.loginPanelTitle}</p>
           <LoginForm redirectTo={next || "/dashboard"} />
         </div>
       )}
 
       <div className="two-col">
         <div className="panel">
-          <p className="panel-title">Como funciona</p>
+          <p className="panel-title">{dict.home.howItWorksTitle}</p>
           <ul className="bullet-list">
-            <li>Crie sua conta e conecte sua conta do YouTube</li>
-            <li>Inicie uma Jam a partir de uma playlist sua</li>
-            <li>Compartilhe o link da Jam com quem quiser</li>
-            <li>Convidados colam links de vídeos do YouTube</li>
-            <li>Você configura limites, duplicados e aprovação</li>
+            {dict.home.howItWorksSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ul>
         </div>
 
         <div className="panel" id="como-funciona">
-          <p className="panel-title">Regras configuráveis por Jam</p>
+          <p className="panel-title">{dict.home.rulesTitle}</p>
           <ul className="bullet-list">
-            <li>Permitir ou não links repetidos</li>
-            <li>Aprovação manual ligada ou desligada</li>
+            <li>{dict.home.allowDuplicatesRule}</li>
+            <li>{dict.home.approvalRule}</li>
             <li>
-              Máximo de links por convidado{" "}
-              <span className="coming-soon">EM BREVE</span>
+              {dict.home.maxLinksRule}{" "}
+              <span className="coming-soon">{dict.home.comingSoon}</span>
             </li>
             <li>
-              Intervalo mínimo entre envios (anti-flood){" "}
-              <span className="coming-soon">EM BREVE</span>
+              {dict.home.minIntervalRule}{" "}
+              <span className="coming-soon">{dict.home.comingSoon}</span>
             </li>
             <li>
-              Deixar playlist pública no Jampla{" "}
-              <span className="coming-soon">EM BREVE</span>
+              {dict.home.publicPlaylistRule}{" "}
+              <span className="coming-soon">{dict.home.comingSoon}</span>
             </li>
           </ul>
         </div>

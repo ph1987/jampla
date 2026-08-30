@@ -9,6 +9,7 @@ import { getUserScore } from "@/lib/ranking";
 import { LocalDateTime } from "@/components/LocalDateTime";
 import { buildNotificationSegments } from "@/lib/notificationView";
 import { PointsBadge } from "@/components/PointsBadge";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function NotificationsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -47,6 +48,7 @@ export default async function NotificationsPage() {
   }
 
   const points = await getUserScore(session.user.id);
+  const dict = await getDictionary();
 
   return (
     <main className="page">
@@ -54,7 +56,7 @@ export default async function NotificationsPage() {
 
       <div className="statline">
         <span>
-          Olá,{" "}
+          {dict.common.greeting}{" "}
           <a href="/dashboard">
             <b>{session.user.username ?? session.user.email}</b>
           </a>
@@ -64,9 +66,9 @@ export default async function NotificationsPage() {
       </div>
 
       <div className="panel">
-        <p className="panel-title">Notificações</p>
+        <p className="panel-title">{dict.notifications.title}</p>
         {notifications.length === 0 ? (
-          <p className="hint-text">Nenhuma notificação ainda.</p>
+          <p className="hint-text">{dict.notifications.none}</p>
         ) : (
           <ul className="bullet-list">
             {notifications.map((n) => {
@@ -77,16 +79,20 @@ export default async function NotificationsPage() {
                 ? `https://www.youtube.com/watch?v=${suggestion.videoId}`
                 : undefined;
 
-              const segments = buildNotificationSegments(n.type, {
-                jamName: jam?.name,
-                jamHref,
-                videoTitle: suggestion?.videoTitle,
-                videoHref,
-              });
+              const segments = buildNotificationSegments(
+                n.type,
+                {
+                  jamName: jam?.name,
+                  jamHref,
+                  videoTitle: suggestion?.videoTitle,
+                  videoHref,
+                },
+                dict,
+              );
 
               return (
                 <li key={n.id} style={{ color: n.read ? undefined : "var(--accent2)" }}>
-                  {!n.read && <span className="stat-badge notif-badge">Nova</span>}
+                  {!n.read && <span className="stat-badge notif-badge">{dict.notifications.newBadge}</span>}
                   <span className="hint-text">
                     <LocalDateTime iso={n.createdAt.toISOString()} />
                   </span>{" "}

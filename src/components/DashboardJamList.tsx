@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { fetcher } from "@/lib/swr";
 import { CopyLinkButton } from "@/components/CopyLinkButton";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 type Jam = { id: string; slug: string; name: string };
 type PendingCounts = Record<string, number>;
@@ -20,10 +21,11 @@ export function DashboardJamList({
     revalidateOnFocus: true,
   });
 
+  const dict = useDictionary();
   const pendingByJam = data ?? initialPendingCounts;
 
   if (jams.length === 0) {
-    return <p className="hint-text">Você ainda não criou nenhuma Jam.</p>;
+    return <p className="hint-text">{dict.dashboard.jamsEmpty}</p>;
   }
 
   return (
@@ -41,7 +43,7 @@ export function DashboardJamList({
               <>
                 {" "}
                 <span style={{ color: "var(--accent2)" }}>
-                  ({pendingCount} pendente{pendingCount > 1 ? "s" : ""})
+                  ({dict.dashboard.pendingSuffix(pendingCount)})
                 </span>
               </>
             )}

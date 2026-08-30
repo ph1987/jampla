@@ -16,13 +16,7 @@ import { getUserScore } from "@/lib/ranking";
 import { getSiteOrigin } from "@/lib/url";
 import { getPlaylistItems } from "@/lib/youtube";
 import { NO_MAX_LINKS, NO_MIN_INTERVAL } from "@/lib/jamLimits";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "pendente",
-  APPROVED: "aprovado",
-  REJECTED: "rejeitado",
-  REMOVED: "removido",
-};
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function JamPage({
   params,
@@ -35,6 +29,7 @@ export default async function JamPage({
   if (!jam) notFound();
 
   const session = await auth.api.getSession({ headers: await headers() });
+  const dict = await getDictionary();
 
   if (!session) {
     return (
@@ -42,9 +37,7 @@ export default async function JamPage({
         <SiteHeader />
         <div className="panel">
           <p className="panel-title">{jam.name}</p>
-          <p className="hint-text">
-            Entre ou crie uma conta para adicionar músicas a esta Jam.
-          </p>
+          <p className="hint-text">{dict.jamPage.loginPrompt}</p>
           <LoginForm redirectTo={`/j/${slug}`} />
         </div>
         <SiteFooter />
@@ -66,7 +59,7 @@ export default async function JamPage({
         <SiteHeader isLoggedIn />
         <div className="panel">
           <p className="panel-title">{jam.name}</p>
-          <p className="error-text">Você foi removido desta Jam.</p>
+          <p className="error-text">{dict.jamPage.bannedMessage}</p>
         </div>
         <SiteFooter />
       </main>
@@ -87,7 +80,7 @@ export default async function JamPage({
   const statline = (
     <div className="statline">
       <span>
-        Olá,{" "}
+        {dict.common.greeting}{" "}
         <a href="/dashboard">
           <b>{session.user.username ?? session.user.email}</b>
         </a>
@@ -130,20 +123,20 @@ export default async function JamPage({
             <div className="panel">
               <p className="panel-title">{jam.name}</p>
               <p className="hint-text">
-                Link para compartilhar:{" "}
+                {dict.jamPage.shareLinkLabel}{" "}
                 <a href={`/j/${jam.slug}`}>
                   {origin}/j/{jam.slug}
                 </a>
                 <CopyLinkButton path={`/j/${jam.slug}`} />
               </p>
               <p className="hint-text">
-                Playlist no YouTube:{" "}
+                {dict.jamPage.youtubePlaylistLabel}{" "}
                 <a
                   href={`https://www.youtube.com/playlist?list=${jam.youtubePlaylistId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  abrir playlist
+                  {dict.jamPage.openPlaylist}
                 </a>
               </p>
             </div>
@@ -186,27 +179,25 @@ export default async function JamPage({
             <p className="panel-title">{jam.name}</p>
             <ul className="bullet-list">
               <li>
-                {jam.allowDuplicates ? "Links repetidos permitidos" : "Sem links repetidos"}
+                {jam.allowDuplicates ? dict.jamPage.allowDuplicatesOn : dict.jamPage.allowDuplicatesOff}
               </li>
               {jam.maxLinksPerUser < NO_MAX_LINKS && (
-                <li>Máx. {jam.maxLinksPerUser} links por convidado</li>
+                <li>{dict.jamPage.maxLinksLine(jam.maxLinksPerUser)}</li>
               )}
               {jam.minSecondsBetween > NO_MIN_INTERVAL && (
-                <li>Intervalo mínimo de {jam.minSecondsBetween}s entre envios</li>
+                <li>{dict.jamPage.minIntervalLine(jam.minSecondsBetween)}</li>
               )}
               <li>
-                {jam.requireApproval
-                  ? "Aprovação manual antes de entrar na playlist"
-                  : "Entra direto na playlist"}
+                {jam.requireApproval ? dict.jamPage.requireApprovalOn : dict.jamPage.requireApprovalOff}
               </li>
             </ul>
             <SubmitLinkForm slug={slug} />
           </div>
 
           <div className="panel">
-            <p className="panel-title">Envios</p>
+            <p className="panel-title">{dict.jamPage.submissionsTitle}</p>
             {suggestions.length === 0 ? (
-              <p className="hint-text">Nenhum link enviado ainda.</p>
+              <p className="hint-text">{dict.jamPage.noSubmissions}</p>
             ) : (
               <ul className="bullet-list">
                 {suggestions.map((s) => (
@@ -214,7 +205,7 @@ export default async function JamPage({
                     {s.videoTitle} —{" "}
                     <span className="hint-text">
                       {submitterNames.get(s.submittedBy) ?? "?"} ·{" "}
-                      {STATUS_LABEL[s.status] ?? s.status}
+                      {dict.jamPage.statusLabels[s.status] ?? s.status}
                     </span>
                   </li>
                 ))}

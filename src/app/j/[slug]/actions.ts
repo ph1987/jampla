@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { extractVideoId, fetchVideoInfo, getYoutubeClient } from "@/lib/youtube";
 import { logActivity } from "@/lib/activityLog";
 import { createNotification } from "@/lib/notifications";
+import { getDictionary } from "@/lib/i18n/server";
 
 export type SubmitLinkState = { error?: string; success?: string };
 
@@ -18,31 +19,32 @@ export async function submitLink(
 ): Promise<SubmitLinkState> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect(`/?next=/j/${slug}`);
+  const dict = await getDictionary();
 
   const jam = await prisma.jam.findUnique({ where: { slug } });
-  if (!jam) return { error: "Jam não encontrada." };
+  if (!jam) return { error: dict.serverErrors.jamNotFound };
 
   const ban = await prisma.jamBan.findUnique({
     where: { jamId_userId: { jamId: jam.id, userId: session.user.id } },
   });
-  if (ban) return { error: "Você foi removido desta Jam." };
+  if (ban) return { error: dict.serverErrors.bannedFromJam };
 
   const linkInput = String(formData.get("videoUrl") ?? "").trim();
   const videoId = extractVideoId(linkInput);
-  if (!videoId) return { error: "Link de vídeo inválido." };
+  if (!videoId) return { error: dict.serverErrors.invalidVideoLink };
 
   if (!jam.allowDuplicates) {
     const duplicate = await prisma.suggestion.findFirst({
       where: { jamId: jam.id, videoId, status: { not: "REJECTED" } },
     });
-    if (duplicate) return { error: "Esse vídeo já foi adicionado a esta Jam." };
+    if (duplicate) return { error: dict.serverErrors.alreadyAdded };
   }
 
   const submissionCount = await prisma.suggestion.count({
     where: { jamId: jam.id, submittedBy: session.user.id, status: { not: "REJECTED" } },
   });
   if (submissionCount >= jam.maxLinksPerUser) {
-    return { error: `Você atingiu o limite de ${jam.maxLinksPerUser} links nesta Jam.` };
+    return { error: dict.serverErrors.submissionLimit(jam.maxLinksPerUser) };
   }
 
   const lastSubmission = await prisma.suggestion.findFirst({
@@ -53,12 +55,12 @@ export async function submitLink(
     const secondsSince = (Date.now() - lastSubmission.createdAt.getTime()) / 1000;
     if (secondsSince < jam.minSecondsBetween) {
       const wait = Math.ceil(jam.minSecondsBetween - secondsSince);
-      return { error: `Aguarde ${wait}s antes de enviar outro link.` };
+      return { error: dict.serverErrors.waitBeforeNext(wait) };
     }
   }
 
   const videoInfo = await fetchVideoInfo(videoId);
-  if (!videoInfo) return { error: "Não foi possível encontrar esse vídeo." };
+  if (!videoInfo) return { error: dict.serverErrors.videoNotFound };
 
   if (jam.requireApproval) {
     const suggestion = await prisma.suggestion.create({
@@ -87,7 +89,7 @@ export async function submitLink(
       });
     }
     revalidatePath(`/j/${slug}`);
-    return { success: "Link enviado! Aguardando aprovação." };
+    return { success: dict.serverErrors.sentAwaitingApproval };
   }
 
   try {
@@ -103,7 +105,7 @@ export async function submitLink(
     });
   } catch (err) {
     console.error("playlistItems.insert failed", err);
-    return { error: "Não foi possível adicionar o vídeo à playlist." };
+    return { error: dict.serverErrors.couldNotAddToPlaylist };
   }
 
   const suggestion = await prisma.suggestion.create({
@@ -125,5 +127,5 @@ export async function submitLink(
     metadata: { autoApproved: true },
   });
   revalidatePath(`/j/${slug}`);
-  return { success: "Adicionado à playlist!" };
+  return { success: dict.serverErrors.addedToPlaylist };
 }

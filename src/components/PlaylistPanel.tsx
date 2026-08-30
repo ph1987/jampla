@@ -1,4 +1,5 @@
 import { truncate } from "@/lib/text";
+import { getDictionary } from "@/lib/i18n/server";
 
 export type PlaylistItem = {
   videoId: string;
@@ -7,20 +8,22 @@ export type PlaylistItem = {
   thumbnailUrl: string;
 };
 
-export function PlaylistPanel({
+export async function PlaylistPanel({
   items,
   error,
 }: {
   items: PlaylistItem[];
   error?: boolean;
 }) {
+  const dict = await getDictionary();
+
   return (
     <div className="panel">
-      <p className="panel-title">Playlist ({items.length})</p>
+      <p className="panel-title">{dict.playlistPanel.title(items.length)}</p>
       {error ? (
-        <p className="error-text">Não foi possível carregar a playlist do YouTube agora.</p>
+        <p className="error-text">{dict.playlistPanel.error}</p>
       ) : items.length === 0 ? (
-        <p className="hint-text">Nenhum vídeo na playlist ainda.</p>
+        <p className="hint-text">{dict.playlistPanel.empty}</p>
       ) : (
         <ul className="bullet-list no-bullet">
           {items.map((item) => (

@@ -6,6 +6,7 @@ import { RegisterForm } from "@/components/RegisterForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function RegisterPage({
   searchParams,
@@ -15,6 +16,7 @@ export default async function RegisterPage({
   const { next } = await searchParams;
   const session = await auth.api.getSession({ headers: await headers() });
   const points = session ? await getUserScore(session.user.id) : 0;
+  const dict = await getDictionary();
 
   return (
     <main className="page">
@@ -23,7 +25,7 @@ export default async function RegisterPage({
       {session ? (
         <div className="statline">
           <span>
-            Olá,{" "}
+            {dict.common.greeting}{" "}
             <a href="/dashboard">
               <b>{session.user.username ?? session.user.email}</b>
             </a>
@@ -33,7 +35,7 @@ export default async function RegisterPage({
         </div>
       ) : (
         <div className="panel">
-          <p className="panel-title">Criar conta</p>
+          <p className="panel-title">{dict.nav.createAccount}</p>
           <RegisterForm redirectTo={next || "/dashboard"} />
         </div>
       )}

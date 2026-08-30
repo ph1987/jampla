@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getYoutubeClient, extractPlaylistId } from "@/lib/youtube";
 import { slugify, randomSuffix } from "@/lib/slug";
 import { logActivity } from "@/lib/activityLog";
+import { getDictionary } from "@/lib/i18n/server";
 
 export type CreateJamState = { error?: string };
 
@@ -16,6 +17,7 @@ export async function createJam(
 ): Promise<CreateJamState> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/");
+  const dict = await getDictionary();
 
   const name = String(formData.get("name") ?? "").trim();
   const createNewPlaylist = formData.get("createNewPlaylist") === "on";
@@ -25,17 +27,17 @@ export async function createJam(
   const maxLinksPerUser = Number(formData.get("maxLinksPerUser") ?? 5);
   const minSecondsBetween = Number(formData.get("minSecondsBetween") ?? 30);
 
-  if (!name) return { error: "Informe um nome para a Jam." };
+  if (!name) return { error: dict.serverErrors.jamNameRequired };
 
   if (!createNewPlaylist && !extractPlaylistId(playlistInput)) {
-    return { error: "Link de playlist inválido." };
+    return { error: dict.serverErrors.invalidPlaylistLink };
   }
 
   if (!Number.isFinite(maxLinksPerUser) || maxLinksPerUser < 1) {
-    return { error: "Máximo de links por convidado inválido." };
+    return { error: dict.serverErrors.invalidMaxLinks };
   }
   if (!Number.isFinite(minSecondsBetween) || minSecondsBetween < 0) {
-    return { error: "Intervalo mínimo entre envios inválido." };
+    return { error: dict.serverErrors.invalidMinInterval };
   }
 
   let youtube;
@@ -43,7 +45,7 @@ export async function createJam(
     youtube = await getYoutubeClient(session.user.id);
   } catch (err) {
     console.error("getYoutubeClient failed", err);
-    return { error: "Conecte sua conta do YouTube antes de criar uma Jam." };
+    return { error: dict.serverErrors.connectYoutubeFirst };
   }
 
   let playlistId: string;
@@ -61,11 +63,11 @@ export async function createJam(
       playlistId = created.data.id;
     } catch (err) {
       console.error("playlists.insert failed", err);
-      return { error: "Não foi possível criar a playlist no YouTube." };
+      return { error: dict.serverErrors.couldNotCreatePlaylist };
     }
   } else {
     const parsedId = extractPlaylistId(playlistInput);
-    if (!parsedId) return { error: "Link de playlist inválido." };
+    if (!parsedId) return { error: dict.serverErrors.invalidPlaylistLink };
 
     const [playlistRes, channelRes] = await Promise.all([
       youtube.playlists.list({ part: ["snippet"], id: [parsedId] }),
@@ -73,11 +75,11 @@ export async function createJam(
     ]);
 
     const playlist = playlistRes.data.items?.[0];
-    if (!playlist) return { error: "Playlist não encontrada." };
+    if (!playlist) return { error: dict.serverErrors.playlistNotFound };
 
     const ownChannelId = channelRes.data.items?.[0]?.id;
     if (!ownChannelId || playlist.snippet?.channelId !== ownChannelId) {
-      return { error: "Essa playlist não pertence à sua conta do YouTube." };
+      return { error: dict.serverErrors.playlistNotYours };
     }
 
     playlistId = parsedId;
@@ -92,7 +94,7 @@ export async function createJam(
       break;
     }
   }
-  if (!slug) return { error: "Não foi possível gerar um link único, tente de novo." };
+  if (!slug) return { error: dict.serverErrors.couldNotGenerateUniqueLink };
 
   const jam = await prisma.jam.create({
     data: {

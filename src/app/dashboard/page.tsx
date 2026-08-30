@@ -12,6 +12,7 @@ import { DashboardJamList } from "@/components/DashboardJamList";
 import { PointsBadge } from "@/components/PointsBadge";
 import { getUserScore } from "@/lib/ranking";
 import { getYoutubeChannelInfo } from "@/lib/youtube";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -40,6 +41,7 @@ export default async function DashboardPage() {
   const channelInfo = youtubeAccount
     ? await getYoutubeChannelInfo(session.user.id)
     : null;
+  const dict = await getDictionary();
 
   return (
     <main className="page">
@@ -47,7 +49,7 @@ export default async function DashboardPage() {
 
       <div className="statline">
         <span>
-          Olá, <b>{session.user.username ?? session.user.email}</b>
+          {dict.common.greeting} <b>{session.user.username ?? session.user.email}</b>
           <PointsBadge points={points} />
           <span className="sep">|</span> <NotificationBadge />
         </span>
@@ -55,7 +57,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="panel">
-        <p className="panel-title">Conta do YouTube</p>
+        <p className="panel-title">{dict.dashboard.youtubeAccountTitle}</p>
         {youtubeAccount ? (
           <>
             {channelInfo ? (
@@ -75,9 +77,7 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                <p className="hint-text">
-                  Jams existentes param de aceitar aprovações até você reconectar.
-                </p>
+                <p className="hint-text">{dict.disconnectYoutube.hint}</p>
               </>
             ) : (
               <DisconnectYoutubeButton accountId={youtubeAccount.id} />
@@ -85,21 +85,18 @@ export default async function DashboardPage() {
           </>
         ) : (
           <>
-            <p className="hint-text">
-              Conecte sua conta do YouTube para poder criar uma Jam a partir
-              de uma playlist sua.
-            </p>
+            <p className="hint-text">{dict.dashboard.connectHint}</p>
             <ConnectYoutubeButton />
           </>
         )}
       </div>
 
       <div className="panel">
-        <p className="panel-title">Minhas Jams</p>
+        <p className="panel-title">{dict.dashboard.myJamsTitle}</p>
         <DashboardJamList jams={jams} initialPendingCounts={initialPendingCounts} />
         {youtubeAccount && (
           <p style={{ marginTop: 10 }}>
-            <a href="/jams/new">[Criar Jam]</a>
+            <a href="/jams/new">{dict.dashboard.createJamLink}</a>
           </p>
         )}
       </div>

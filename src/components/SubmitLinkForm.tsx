@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { submitLink, type SubmitLinkState } from "@/app/j/[slug]/actions";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 type SearchResult = {
   videoId: string;
@@ -13,6 +14,7 @@ type SearchResult = {
 const initialState: SubmitLinkState = {};
 
 export function SubmitLinkForm({ slug }: { slug: string }) {
+  const dict = useDictionary();
   const action = submitLink.bind(null, slug);
   const [state, formAction, pending] = useActionState(action, initialState);
   const formRef = useRef<HTMLFormElement>(null);
@@ -34,7 +36,7 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
       const data = await res.json();
       setResults(data.results ?? []);
     } catch {
-      setSearchError("Não foi possível buscar agora.");
+      setSearchError(dict.submitLinkForm.searchError);
     } finally {
       setSearching(false);
     }
@@ -55,12 +57,12 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
             ref={linkInputRef}
             type="text"
             name="videoUrl"
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder={dict.submitLinkForm.linkPlaceholder}
             autoComplete="off"
             style={{ minWidth: 320 }}
           />
           <button type="submit" disabled={pending}>
-            {pending ? "..." : "Adicionar"}
+            {pending ? "..." : dict.submitLinkForm.addButton}
           </button>
         </div>
         {state.error && <p className="error-text">{state.error}</p>}
@@ -77,7 +79,7 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ou busque por nome da música/artista"
+            placeholder={dict.submitLinkForm.searchPlaceholder}
             autoComplete="off"
             style={{ width: "100%", paddingRight: query ? 22 : undefined }}
           />
@@ -85,8 +87,8 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
             <button
               type="button"
               className="input-clear-btn"
-              title="Limpar busca"
-              aria-label="Limpar busca"
+              title={dict.submitLinkForm.clearSearchTitle}
+              aria-label={dict.submitLinkForm.clearSearchTitle}
               onClick={() => {
                 setQuery("");
                 setResults([]);
@@ -97,7 +99,7 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
           )}
         </div>
         <button type="submit" disabled={searching}>
-          {searching ? "..." : "Buscar"}
+          {searching ? "..." : dict.submitLinkForm.searchButton}
         </button>
       </form>
       {searchError && <p className="error-text">{searchError}</p>}
@@ -105,7 +107,7 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
       {results.length > 0 && (
         <>
           <p className="hint-text" style={{ marginTop: 8 }}>
-            Clique no vídeo para adicionar à playlist
+            {dict.submitLinkForm.clickVideoHint}
           </p>
           <ul className="bullet-list no-bullet">
             {results.map((r) => (
@@ -113,7 +115,7 @@ export function SubmitLinkForm({ slug }: { slug: string }) {
                 <button
                   type="button"
                   className="search-result"
-                  title="Clique para adicionar"
+                  title={dict.submitLinkForm.clickToAddTitle}
                   onClick={() => selectResult(r.videoId)}
                 >
                   <img

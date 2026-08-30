@@ -3,10 +3,12 @@
 import { useActionState, useState } from "react";
 import { createJam, type CreateJamState } from "@/app/jams/new/actions";
 import { NO_MAX_LINKS, NO_MIN_INTERVAL } from "@/lib/jamLimits";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 const initialState: CreateJamState = {};
 
 export function CreateJamForm() {
+  const dict = useDictionary();
   const [state, formAction, pending] = useActionState(createJam, initialState);
   const [createNewPlaylist, setCreateNewPlaylist] = useState(false);
 
@@ -15,19 +17,19 @@ export function CreateJamForm() {
       <table>
         <tbody>
           <tr>
-            <td className="field-label">Nome da Jam</td>
+            <td className="field-label">{dict.createJamForm.nameLabel}</td>
             <td>
               <input type="text" name="name" autoComplete="off" />
             </td>
           </tr>
           {!createNewPlaylist && (
             <tr>
-              <td className="field-label">Link da playlist</td>
+              <td className="field-label">{dict.createJamForm.playlistLinkLabel}</td>
               <td>
                 <input
                   type="text"
                   name="playlistUrl"
-                  placeholder="https://www.youtube.com/playlist?list=..."
+                  placeholder={dict.createJamForm.playlistLinkPlaceholder}
                   autoComplete="off"
                 />
               </td>
@@ -43,7 +45,7 @@ export function CreateJamForm() {
             checked={createNewPlaylist}
             onChange={(e) => setCreateNewPlaylist(e.target.checked)}
           />{" "}
-          Criar playlist nova no YouTube (não tenho uma ainda)
+          {dict.createJamForm.createNewPlaylistLabel}
         </label>
       </div>
       {/* Limites por convidado desativados por enquanto — valores fixos sem restrição, até remodelar essa parte */}
@@ -52,18 +54,18 @@ export function CreateJamForm() {
 
       <div className="row" style={{ marginTop: 8 }}>
         <label>
-          <input type="checkbox" name="allowDuplicates" /> Permitir links repetidos
+          <input type="checkbox" name="allowDuplicates" /> {dict.createJamForm.allowDuplicatesLabel}
         </label>
       </div>
       <div className="row">
         <label>
-          <input type="checkbox" name="requireApproval" defaultChecked /> Aprovação
-          manual antes de entrar na playlist
+          <input type="checkbox" name="requireApproval" defaultChecked />{" "}
+          {dict.createJamForm.requireApprovalLabel}
         </label>
       </div>
 
       <button type="submit" disabled={pending} style={{ marginTop: 10 }}>
-        {pending ? "..." : "Criar Jam"}
+        {pending ? "..." : dict.createJamForm.submit}
       </button>
       {state.error && <p className="error-text">{state.error}</p>}
     </form>

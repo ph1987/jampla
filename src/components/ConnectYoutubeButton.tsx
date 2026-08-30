@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function ConnectYoutubeButton() {
+  const dict = useDictionary();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,14 +20,14 @@ export function ConnectYoutubeButton() {
     });
     setLoading(false);
     if (linkError) {
-      setError(friendlyAuthError(linkError, "Não foi possível conectar o YouTube."));
+      setError(friendlyAuthError(linkError, dict.connectYoutube.genericError, dict));
     }
   }
 
   return (
     <div>
       <button type="button" onClick={handleConnect} disabled={loading}>
-        {loading ? "..." : "Conectar YouTube"}
+        {loading ? "..." : dict.connectYoutube.button}
       </button>
       {error && <p className="error-text">{error}</p>}
     </div>

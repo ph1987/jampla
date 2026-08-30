@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function CopyLinkButton({ path }: { path: string }) {
+  const dict = useDictionary();
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function handleCopy() {
@@ -20,11 +22,11 @@ export function CopyLinkButton({ path }: { path: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      title="Copiar link"
-      aria-label="Copiar link"
+      title={dict.copyLink.title}
+      aria-label={dict.copyLink.title}
       style={{ fontSize: 11, padding: "0 6px", marginLeft: 4 }}
     >
-      {status === "copied" ? "copiado!" : status === "error" ? "falhou" : "⧉"}
+      {status === "copied" ? dict.copyLink.copied : status === "error" ? dict.copyLink.failed : "⧉"}
     </button>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function DisconnectYoutubeButton({
   accountId,
@@ -12,6 +13,7 @@ export function DisconnectYoutubeButton({
   accountId: string;
   showHint?: boolean;
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +24,7 @@ export function DisconnectYoutubeButton({
     const { error: unlinkError } = await authClient.unlinkAccount({ accountId });
     setLoading(false);
     if (unlinkError) {
-      setError(friendlyAuthError(unlinkError, "Não foi possível desconectar o YouTube."));
+      setError(friendlyAuthError(unlinkError, dict.disconnectYoutube.genericError, dict));
       return;
     }
     router.refresh();
@@ -31,13 +33,9 @@ export function DisconnectYoutubeButton({
   return (
     <div>
       <button type="button" onClick={handleDisconnect} disabled={loading}>
-        {loading ? "..." : "Desconectar YouTube"}
+        {loading ? "..." : dict.disconnectYoutube.button}
       </button>
-      {showHint && (
-        <p className="hint-text">
-          Jams existentes param de aceitar aprovações até você reconectar.
-        </p>
-      )}
+      {showHint && <p className="hint-text">{dict.disconnectYoutube.hint}</p>}
       {error && <p className="error-text">{error}</p>}
     </div>
   );

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/authErrors";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
+  const dict = useDictionary();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -16,15 +18,15 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !username || !password) {
-      setError("Preencha todos os campos.");
+      setError(dict.register.fillAllFieldsError);
       return;
     }
     if (password.length < 8) {
-      setError("A senha precisa ter pelo menos 8 caracteres.");
+      setError(dict.register.passwordTooShortError);
       return;
     }
     if (password !== confirmPassword) {
-      setError("As senhas não conferem.");
+      setError(dict.register.passwordMismatchError);
       return;
     }
     setError("");
@@ -38,7 +40,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
     });
     setLoading(false);
     if (signUpError) {
-      setError(friendlyAuthError(signUpError, "Não foi possível criar a conta. Tente novamente em instantes."));
+      setError(friendlyAuthError(signUpError, dict.register.genericError, dict));
       return;
     }
     setDone(true);
@@ -47,8 +49,9 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
   if (done) {
     return (
       <p>
-        Conta criada. Enviamos um link de confirmação para <b>{email}</b> —
-        confirme para poder entrar.
+        {dict.register.donePrefix}
+        <b>{email}</b>
+        {dict.register.doneSuffix}
       </p>
     );
   }
@@ -58,7 +61,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
       <table>
         <tbody>
           <tr>
-            <td className="field-label">E-mail</td>
+            <td className="field-label">{dict.register.email}</td>
             <td>
               <input
                 type="email"
@@ -69,7 +72,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
             </td>
           </tr>
           <tr>
-            <td className="field-label">Username</td>
+            <td className="field-label">{dict.register.username}</td>
             <td>
               <input
                 type="text"
@@ -80,7 +83,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
             </td>
           </tr>
           <tr>
-            <td className="field-label">Senha</td>
+            <td className="field-label">{dict.register.password}</td>
             <td>
               <input
                 type="password"
@@ -91,7 +94,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
             </td>
           </tr>
           <tr>
-            <td className="field-label">Confirmar senha</td>
+            <td className="field-label">{dict.register.confirmPassword}</td>
             <td>
               <input
                 type="password"
@@ -104,7 +107,7 @@ export function RegisterForm({ redirectTo = "/dashboard" }: { redirectTo?: strin
         </tbody>
       </table>
       <button type="submit" disabled={loading} style={{ marginTop: 10 }}>
-        {loading ? "..." : "Criar conta"}
+        {loading ? "..." : dict.register.submit}
       </button>
       {error && <p className="error-text">{error}</p>}
     </form>

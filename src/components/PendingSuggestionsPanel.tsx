@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { useState } from "react";
 import { fetcher } from "@/lib/swr";
 import { approveSuggestion, rejectSuggestion, removeSuggestion } from "@/app/jams/[slug]/actions";
+import { useDictionary } from "@/lib/i18n/LocaleProvider";
 
 type Suggestion = {
   id: string;
@@ -20,13 +21,6 @@ type SuggestionsResponse = {
   submitterNames: Record<string, string | null>;
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "pendente",
-  APPROVED: "aprovado",
-  REJECTED: "rejeitado",
-  REMOVED: "removido",
-};
-
 export function PendingSuggestionsPanel({
   slug,
   initialData,
@@ -34,6 +28,7 @@ export function PendingSuggestionsPanel({
   slug: string;
   initialData: SuggestionsResponse;
 }) {
+  const dict = useDictionary();
   const { data, mutate } = useSWR<SuggestionsResponse>(
     `/api/jams/${slug}/suggestions`,
     fetcher,
@@ -67,7 +62,7 @@ export function PendingSuggestionsPanel({
       await removeSuggestion(fd);
       await mutate();
     } catch {
-      setRemoveError("Não foi possível remover essa música da playlist. Tente de novo.");
+      setRemoveError(dict.pendingSuggestionsPanel.removeError);
     } finally {
       setPendingActionId(null);
     }
@@ -76,9 +71,9 @@ export function PendingSuggestionsPanel({
   return (
     <>
       <div className="panel">
-        <p className="panel-title">Pendentes ({pending.length})</p>
+        <p className="panel-title">{dict.pendingSuggestionsPanel.pendingTitle(pending.length)}</p>
         {pending.length === 0 ? (
-          <p className="hint-text">Nenhuma sugestão pendente.</p>
+          <p className="hint-text">{dict.pendingSuggestionsPanel.noPending}</p>
         ) : (
           <ul className="bullet-list no-bullet">
             {pending.map((s) => (
@@ -116,14 +111,14 @@ export function PendingSuggestionsPanel({
                       disabled={pendingActionId === s.id}
                       onClick={() => handleReview(approveSuggestion, s.id)}
                     >
-                      Aprovar
+                      {dict.pendingSuggestionsPanel.approve}
                     </button>
                     <button
                       type="button"
                       disabled={pendingActionId === s.id}
                       onClick={() => handleReview(rejectSuggestion, s.id)}
                     >
-                      Rejeitar
+                      {dict.pendingSuggestionsPanel.reject}
                     </button>
                   </span>
                 </div>
@@ -134,10 +129,10 @@ export function PendingSuggestionsPanel({
       </div>
 
       <div className="panel">
-        <p className="panel-title">Histórico recente</p>
+        <p className="panel-title">{dict.pendingSuggestionsPanel.historyTitle}</p>
         {removeError && <p className="error-text">{removeError}</p>}
         {reviewed.length === 0 ? (
-          <p className="hint-text">Nada revisado ainda.</p>
+          <p className="hint-text">{dict.pendingSuggestionsPanel.noHistory}</p>
         ) : (
           <ul className="bullet-list">
             {reviewed.map((s) => (
@@ -146,7 +141,7 @@ export function PendingSuggestionsPanel({
                   {s.videoTitle} —{" "}
                   <span className="hint-text">
                     {submitterNames[s.submittedBy] ?? "?"} ·{" "}
-                    {STATUS_LABEL[s.status] ?? s.status}
+                    {dict.pendingSuggestionsPanel.statusLabels[s.status] ?? s.status}
                   </span>
                 </span>
                 {s.status === "APPROVED" && (
@@ -156,7 +151,7 @@ export function PendingSuggestionsPanel({
                     onClick={() => handleRemove(s.id)}
                     style={{ fontSize: 11, padding: "0 6px" }}
                   >
-                    Remover
+                    {dict.pendingSuggestionsPanel.removeButton}
                   </button>
                 )}
               </li>

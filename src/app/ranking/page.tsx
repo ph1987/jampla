@@ -6,15 +6,17 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { PointsBadge } from "@/components/PointsBadge";
+import { getDictionary } from "@/lib/i18n/server";
 
 const TOP_N = 10;
 
 export default async function RankingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
+  const dict = await getDictionary();
 
-  // Pontos já ganhos continuam contando mesmo se a música for removida da
-  // playlist depois — REMOVED conta aqui junto com APPROVED de propósito.
   const approved = await prisma.suggestion.findMany({
+    // Pontos já ganhos continuam contando mesmo se a música for removida da
+    // playlist depois — REMOVED conta aqui junto com APPROVED de propósito.
     where: { status: { in: ["APPROVED", "REMOVED"] } },
     select: {
       submittedBy: true,
@@ -71,7 +73,7 @@ export default async function RankingPage() {
       {session && (
         <div className="statline">
           <span>
-            Olá,{" "}
+            {dict.common.greeting}{" "}
             <a href="/dashboard">
               <b>{session.user.username ?? session.user.email}</b>
             </a>
@@ -84,30 +86,31 @@ export default async function RankingPage() {
 
       <div className="ranking-grid">
         <div className="panel">
-          <p className="panel-title">Como ganhar pontos</p>
+          <p className="panel-title">{dict.ranking.howToEarnTitle}</p>
           {session && (
-            <p>Sua pontuação é: <b>{pointsByUser.get(session.user.id) ?? 0}</b></p>
+            <p>
+              {dict.ranking.yourScorePrefix}
+              <b>{pointsByUser.get(session.user.id) ?? 0}</b>
+            </p>
           )}
           <p className="hint-text" style={{ margin: "4px 0" }}>
-            1 ponto por aprovação
+            {dict.ranking.point1Line}
           </p>
           <p className="hint-text" style={{ margin: "4px 0" }}>
-            3 pontos por aprovação
+            {dict.ranking.point3Line}
           </p>
         </div>
 
         <div className="panel">
-          <p className="panel-title">Ranking por pontos</p>
+          <p className="panel-title">{dict.ranking.byPointsTitle}</p>
           {topByPoints.length === 0 ? (
-            <p className="hint-text">Ninguém pontuou ainda.</p>
+            <p className="hint-text">{dict.ranking.noOneScored}</p>
           ) : (
             <ul className="bullet-list no-bullet">
               {topByPoints.map(([userId, points], i) => (
                 <li key={userId}>
                   {i + 1}. {userNames.get(userId) ?? "?"} —{" "}
-                  <span className="hint-text">
-                    {points} ponto{points > 1 ? "s" : ""}
-                  </span>
+                  <span className="hint-text">{dict.ranking.pointWord(points)}</span>
                 </li>
               ))}
             </ul>
@@ -115,17 +118,15 @@ export default async function RankingPage() {
         </div>
 
         <div className="panel">
-          <p className="panel-title">Ranking por aprovações (envios)</p>
+          <p className="panel-title">{dict.ranking.byApprovalsTitle}</p>
           {topByApproved.length === 0 ? (
-            <p className="hint-text">Nenhuma música aprovada ainda.</p>
+            <p className="hint-text">{dict.ranking.noApprovedYet}</p>
           ) : (
             <ul className="bullet-list no-bullet">
               {topByApproved.map(([userId, count], i) => (
                 <li key={userId}>
                   {i + 1}. {userNames.get(userId) ?? "?"} —{" "}
-                  <span className="hint-text">
-                    {count} aprovaç{count > 1 ? "ões" : "ão"}
-                  </span>
+                  <span className="hint-text">{dict.ranking.approvalWord(count)}</span>
                 </li>
               ))}
             </ul>
@@ -133,17 +134,15 @@ export default async function RankingPage() {
         </div>
 
         <div className="panel">
-          <p className="panel-title">Playlists com mais aprovações do público</p>
+          <p className="panel-title">{dict.ranking.topJamsTitle}</p>
           {topJams.length === 0 ? (
-            <p className="hint-text">Nenhuma Jam com aprovações do público ainda.</p>
+            <p className="hint-text">{dict.ranking.noPublicApprovals}</p>
           ) : (
             <ul className="bullet-list no-bullet">
               {topJams.map(([jamId, entry], i) => (
                 <li key={jamId}>
                   {i + 1}. <a href={`/j/${entry.slug}`}>{entry.name}</a> —{" "}
-                  <span className="hint-text">
-                    {entry.count} aprovaç{entry.count > 1 ? "ões" : "ão"}
-                  </span>
+                  <span className="hint-text">{dict.ranking.approvalWord(entry.count)}</span>
                 </li>
               ))}
             </ul>
