@@ -91,6 +91,41 @@ export async function getPlaylistItems(
   }
 }
 
+export async function removeVideoFromPlaylist(
+  ownerId: string,
+  playlistId: string,
+  videoId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const youtube = await getYoutubeClient(ownerId);
+
+    // playlistItems.delete needs the playlist ITEM id, not the video id, so
+    // find it first by paging through the playlist looking for this video.
+    let pageToken: string | undefined;
+    let playlistItemId: string | undefined;
+    do {
+      const res = await youtube.playlistItems.list({
+        part: ["id", "snippet"],
+        playlistId,
+        maxResults: 50,
+        pageToken,
+      });
+      playlistItemId = (res.data.items ?? []).find(
+        (item) => item.snippet?.resourceId?.videoId === videoId,
+      )?.id ?? undefined;
+      pageToken = res.data.nextPageToken ?? undefined;
+    } while (!playlistItemId && pageToken);
+
+    if (!playlistItemId) return { ok: false, error: "NOT_FOUND_IN_PLAYLIST" };
+
+    await youtube.playlistItems.delete({ id: playlistItemId });
+    return { ok: true };
+  } catch (err) {
+    console.error("removeVideoFromPlaylist failed", err);
+    return { ok: false, error: "REQUEST_FAILED" };
+  }
+}
+
 export function extractVideoId(input: string): string | null {
   const trimmed = input.trim();
   try {

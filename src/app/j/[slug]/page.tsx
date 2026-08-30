@@ -21,6 +21,7 @@ const STATUS_LABEL: Record<string, string> = {
   PENDING: "pendente",
   APPROVED: "aprovado",
   REJECTED: "rejeitado",
+  REMOVED: "removido",
 };
 
 export default async function JamPage({

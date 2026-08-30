@@ -52,6 +52,7 @@ enum SuggestionStatus {
   PENDING
   APPROVED
   REJECTED
+  REMOVED
 }
 
 model ActivityLog {

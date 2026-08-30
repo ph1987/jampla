@@ -12,8 +12,10 @@ const TOP_N = 10;
 export default async function RankingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
 
+  // Pontos já ganhos continuam contando mesmo se a música for removida da
+  // playlist depois — REMOVED conta aqui junto com APPROVED de propósito.
   const approved = await prisma.suggestion.findMany({
-    where: { status: "APPROVED" },
+    where: { status: { in: ["APPROVED", "REMOVED"] } },
     select: {
       submittedBy: true,
       jamId: true,
