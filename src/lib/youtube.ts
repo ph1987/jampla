@@ -36,6 +36,40 @@ export async function getYoutubeChannelInfo(
   }
 }
 
+export type VideoSearchResult = {
+  videoId: string;
+  title: string;
+  channelTitle: string;
+  thumbnailUrl: string;
+};
+
+export async function searchYoutubeVideos(
+  ownerId: string,
+  query: string,
+): Promise<VideoSearchResult[]> {
+  try {
+    const youtube = await getYoutubeClient(ownerId);
+    const res = await youtube.search.list({
+      part: ["snippet"],
+      q: query,
+      type: ["video"],
+      maxResults: 8,
+    });
+    return (res.data.items ?? [])
+      .map((item) => ({
+        videoId: item.id?.videoId ?? "",
+        title: item.snippet?.title ?? "",
+        channelTitle: item.snippet?.channelTitle ?? "",
+        thumbnailUrl:
+          item.snippet?.thumbnails?.default?.url ?? item.snippet?.thumbnails?.medium?.url ?? "",
+      }))
+      .filter((item) => item.videoId);
+  } catch (err) {
+    console.error("searchYoutubeVideos failed", err);
+    return [];
+  }
+}
+
 export type PlaylistVideo = {
   videoId: string;
   title: string;

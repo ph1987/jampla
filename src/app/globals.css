@@ -193,6 +193,59 @@ button:disabled {
   cursor: default;
 }
 
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 4px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-result:hover {
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.input-clear-btn {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 0 5px;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.input-clear-btn:hover {
+  color: var(--accent2);
+  background: none;
+}
+
+.fade-out-message {
+  animation: fade-out-message 10s ease-in forwards;
+}
+
+@keyframes fade-out-message {
+  0%, 90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-out-message {
+    animation: none;
+  }
+}
+
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
